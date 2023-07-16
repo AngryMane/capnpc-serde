@@ -1,0 +1,263 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "id_map": {
+      "type": "object",
+      "patternProperties": {
+        "^[0-9]+$" : {"$ref": "#/definitions/node"}
+      }
+    },
+    "root_id": { "type": "string" }
+  },
+  "required": [
+    "id_map",
+    "root_id"
+  ],
+  "definitions": {
+    "type_": {
+      "oneOf":[
+        {
+          "type": "string",
+          "enum": [
+            "Void",
+            "Bool",
+            "Int8",
+            "Int16",
+            "Int32",
+            "Int64",
+            "Uint16",
+            "Uint32",
+            "Uint64",
+            "Float32",
+            "Float64",
+            "Text",
+            "Data"
+          ]
+        }, 
+        {
+          "type": "object",
+          "properties": {
+            "List":{"$ref": "#/definitions/type_"}
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Enum":{"$ref": "#/definitions/enum"}
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Struct":{"$ref": "#/definitions/struct"}
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "Interface":{"$ref": "#/definitions/interface"}
+          }
+        }
+      ]
+    },
+    "value": {
+      "anyOf":[
+        {"type": "object", "properties": {
+          "bool": {"type": "boolean"}
+        }},
+        {"type": "object", "properties": {
+          "Int8": {"type": "integer"}
+        }},
+        {"type": "object", "properties": {
+          "Int16": {"type": "integer"}
+        }},
+        {"type": "object", "properties": {
+          "Int32": {"type": "integer"}
+        }},
+        {"type": "object", "properties": {
+          "Int64": {"type": "integer"}
+        }},
+        {"type": "object", "properties": {
+          "Uint8": {"type": "integer"}
+        }},
+        {"type": "object", "properties": {
+          "Uint16": {"type": "integer"}
+        }},
+        {"type": "object", "properties": {
+          "Uint32": {"type": "integer"}
+        }},
+        {"type": "object", "properties": {
+          "Uint64": {"type": "integer"}
+        }},
+        {"type": "object", "properties": {
+          "Float32": {"type": "string"}
+        }},
+        {"type": "object", "properties": {
+          "Float64": {"type": "string"}
+        }},
+        {"type": "object", "properties": {
+          "Text": {"type": "string"}
+        }},
+        {"type": "object", "properties": {
+          "Data": {
+            "type": "array",
+            "items":[{"type": "integer"}]
+          }
+        }},
+        {"type": "object", "properties": {
+          "Enum": {"type": "integer"}
+        }}
+      ]
+
+    },
+    "slot": {
+      "type": "object",
+      "properties": {
+        "field_type": {"type": "string"},
+        "name": {"type": "string"},
+        "is_interface": {"type": "boolean"},
+        "has_default": {"type": "boolean"},
+        "type_": {"$ref": "#/definitions/type_"},
+        "default_value": {"$ref": "#/definitions/value" },
+        "annotations": {
+          "type": "array",
+          "items":[ { "$ref" : "#/definitions/annotation" } ]
+        }
+      }
+    },
+    "group": {
+      "allof": [
+        {"$ref": "#/definitions/struct"},
+        {
+          "type": "object",
+          "properties": {
+            "fileld_type": {"type": "string" },
+            "name": {"type": "string" },
+            "type_id": {"type": "integer" }
+          }
+        }
+      ]
+    },
+    "method": {
+      "type" : "object",
+      "properties": {
+        "name": {"type": "string"},
+        "parameters": {"$ref": "#/definitions/struct"},
+        "results": {"$ref": "#/definitions/struct"},
+        "annotations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/annotation"
+          }
+        }
+      }
+    },
+    "field": {
+      "oneOf":[
+        {"$ref": "#/definitions/slot"},
+        {"$ref": "#/definitions/group"}
+      ]
+    },
+    "annotation": {
+      "type": "object",
+      "properties": {
+        "base_name": {"type": "string"},
+        "path": {"type": "string"},
+        "file_name": {"type": "string"},
+        "value": {"$ref": "#/definitions/value"}
+      }
+    },
+    "annotationdecl": {
+      "$ref": "#/definitions/common_node"
+    },
+    "interface": {
+      "allOf":[
+        {"$ref": "#/definitions/common_node"},
+        {
+          "type": "object", 
+          "properties": {
+            "methos": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/method"}
+            }
+          }
+        }
+      ]
+    },
+    "enum": {
+      "allOf":[
+        {"$ref": "#/definitions/common_node"}
+      ]
+    },
+    "const": {
+      "allOf":[
+        {"$ref": "#/definitions/common_node"},
+        {
+          "type": "object",
+          "properties": {
+            "type_": {"$ref": "#/definitions/type_"},
+            "value": {"$ref": "#/definitions/value"}
+          }
+        }
+      ]
+    },
+    "file": {
+      "allOf":[
+        {"$ref": "#/definitions/common_node"},
+        {
+          "type": "object",
+          "properties": {
+            "imported_file": {
+              "type" : "array",
+              "items": {
+                "$ref": "#/definitions/file"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "struct": {
+      "oneOf":[
+        {
+          "allOf":[
+            {"$ref": "#/definitions/common_node"},
+            {
+              "type": "object",
+              "properties": {
+                "is_union": {"type": "boolean"},
+                "fields": {"type":"array", "items": {"$ref": "#/definitions/field"}}
+              }
+            }
+          ]
+        },
+        { "type": "string" }
+      ]
+    },
+    "common_node":{
+      "type": "object",
+      "properties": {
+        "node_type": { "type":"string" },
+        "id": { "type": "string" },
+        "parent_id": { "type": "string" },
+        "base_name": { "type": "string" },
+        "paths": { "type":"array", "items": { "type": "string" } },
+        "abs_file_path": { "type": "string" },
+        "nested_nodes": { "type": "array", "items": {"$ref": "#/definitions/node" }},
+        "annotations": {"type": "array", "items": {"$ref": "#/definitions/annotation" }}
+      }
+    },
+    "node": {
+      "anyOf":[
+        {"$ref": "#/definitions/file"},
+        {"$ref": "#/definitions/struct"},
+        {"$ref": "#/definitions/interface"},
+        {"$ref": "#/definitions/enum"},
+        {"$ref": "#/definitions/const"},
+        {"$ref": "#/definitions/annotationdecl"}
+      ]
+    }
+  }
+}
