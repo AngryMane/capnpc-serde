@@ -1,0 +1,61 @@
+{%- import "method.tmpl" as method_tmpl -%}
+
+{################################}
+{# extract_payload_type_of_list #}
+{################################}
+{%- macro extract_payload_type_of_list(list) -%}
+{%- if list is object -%}
+{%- if list is containing("List") -%}
+{{ self::extract_payload_type_of_list(list=list["List"]) }}
+{%- else -%}
+{%- for key, value in list -%}
+{{value.base_name}}
+{%- endfor -%}
+{%- endif -%}
+{%- endif -%}
+{%- endmacro extract_payload_type_of_list -%}
+
+{########################}
+{# extract_relationship #}
+{########################}
+{%- macro extract_relationship(parent_name, field) -%}
+{%- if field.field_type == "Slot" -%}
+{%- if field.type_ is object -%}
+{%- if field.type_ is containing("List") -%}
+{%- set payload_type = self::extract_payload_type_of_list(list=field.type_) -%}
+{%- if payload_type | length > 0 -%}
+{{parent_name}} --> {{ payload_type }}
+{% endif -%}
+{% else -%}
+{%- set payload_type = get_complex_type_name(complex_type=field.type_) -%}
+{%- if payload_type | length > 0 -%}
+{{parent_name}} --> {{ payload_type }}
+{% endif -%}
+{% endif -%}
+{% endif -%}
+{%- endif -%}
+{%- if field.field_type == "Group" -%}
+{{parent_name}} *-- {{ get_name_by_id(id=field.type_id) }}
+{% endif -%}
+{%- endmacro extract_relationship -%}
+
+class {{ interface.base_name }} 
+<<interface>> {{ interface.base_name }}
+{% for cur in interface.methods -%}
+{{ method_tmpl::render_method(method=cur, parent_name=interface.base_name) }}
+{%- endfor %}
+{%- set array = [] -%}
+{% for cur_method in interface.methods -%}
+{%- for cur in cur_method.parameters.fields -%} 
+{%- set a = self::extract_relationship(parent_name=interface.base_name, field=cur) -%}
+{%- set_global array = array | concat(with=a) -%}
+{%- endfor -%}
+{%- endfor %}
+{%- for cur in  array | unique -%}
+{%- if cur | length > 0 -%}
+{{ cur }}
+{%- endif -%}
+{%- endfor -%}
+{%- for cur in interface.nested_nodes %}
+{{ render_node(id=cur) }}
+{%- endfor -%}

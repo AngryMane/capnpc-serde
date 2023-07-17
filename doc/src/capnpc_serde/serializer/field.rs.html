@@ -188,7 +188,7 @@
 </span><span class="kw">struct </span>Group {
     field_type: String,
     name: String,
-    type_id: u64,
+    type_id: String,
     <span class="attr">#[serde(flatten)]
     </span>fields: serde_json::Value,
 }
@@ -257,7 +257,7 @@
         <span class="prelude-val">Ok</span>(Group {
             field_type,
             name,
-            type_id: group.get_type_id(),
+            type_id: group.get_type_id().to_string(),
             fields,
         })
     }

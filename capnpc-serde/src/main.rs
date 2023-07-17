@@ -37,7 +37,13 @@ pub fn main() {
     let args = Args::parse();
     let ret = __serialize(&args);
 
-    println!("{}", serde_json::to_value(&ret).unwrap());
+    writeln!(
+        &mut std::io::stdout(),
+        "{}",
+        serde_json::to_value(&ret).unwrap()
+    )
+    .unwrap_or_else(|_| std::process::exit(0));
+
     let Some(output_file_path) = args.output_file_path else {
         return;
     };

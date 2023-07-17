@@ -1,3 +1,4 @@
+use capnp::schema_capnp::node;
 use capnpc::codegen::GeneratorContext;
 use log::debug;
 use std::fmt;
@@ -28,6 +29,7 @@ pub fn serialize_enum(
 struct EnumNode {
     #[serde(flatten)]
     common_node: CommonNode,
+    enum_names: Vec<String>,
 }
 
 impl EnumNode {
@@ -38,7 +40,21 @@ impl EnumNode {
         abs_file_path: &PathBuf,
     ) -> CapSerResult<Self> {
         let common_node = CommonNode::new(cache, ctx, String::from("Enum"), id, abs_file_path);
-        Ok(EnumNode { common_node })
+        let node: node::Reader = ctx.node_map[&id];
+        let node::Enum(enum_node_unit) = node.which()? else {
+            return Err(CapSerError::new("This is not enum node"));
+        };
+        let enum_names: Vec<String> = enum_node_unit
+            .get_enumerants()
+            .unwrap()
+            .into_iter()
+            .map(|x| String::from(x.get_name().unwrap()))
+            .collect();
+
+        Ok(EnumNode {
+            common_node,
+            enum_names,
+        })
     }
 }
 

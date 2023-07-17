@@ -34,6 +34,7 @@ struct StructNode {
     common_node: CommonNode,
     is_union: bool,
     fields: Vec<serde_json::Value>,
+    union_fields: Vec<serde_json::Value>,
 }
 
 impl StructNode {
@@ -54,18 +55,21 @@ impl StructNode {
         let fields: Vec<serde_json::Value> = struct_
             .get_fields()?
             .iter()
+            .filter(|x| x.get_discriminant_value() == field::NO_DISCRIMINANT)
             .filter_map(|x| StructNode::create_field(cache, ctx, abs_file_path, &x).ok())
             .collect();
-        let is_union = struct_
+        let union_fields: Vec<serde_json::Value> = struct_
             .get_fields()?
             .iter()
-            .find(|x| x.get_discriminant_value() != field::NO_DISCRIMINANT)
-            .map_or_else(|| true, |_| false);
-
+            .filter(|x| x.get_discriminant_value() != field::NO_DISCRIMINANT)
+            .filter_map(|x| StructNode::create_field(cache, ctx, abs_file_path, &x).ok())
+            .collect();
+        let is_union = fields.is_empty();
         Ok(StructNode {
             common_node,
             is_union,
             fields,
+            union_fields,
         })
     }
 

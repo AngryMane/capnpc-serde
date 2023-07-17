@@ -188,7 +188,13 @@
     },
     "enum": {
       "allOf":[
-        {"$ref": "#/definitions/common_node"}
+        {"$ref": "#/definitions/common_node"},
+        {
+          "type": "array",
+          "items":[
+            {"type": "string"}
+          ]
+        }
       ]
     },
     "const": {
@@ -228,7 +234,8 @@
               "type": "object",
               "properties": {
                 "is_union": {"type": "boolean"},
-                "fields": {"type":"array", "items": {"$ref": "#/definitions/field"}}
+                "fields": {"type":"array", "items": {"$ref": "#/definitions/field"}},
+                "union_fields": {"type":"array", "items": {"$ref": "#/definitions/field"}}
               }
             }
           ]

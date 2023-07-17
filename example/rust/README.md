@@ -1,0 +1,1 @@
+This example app converts a capn proto schema file to mermaid class diagram.

@@ -1,0 +1,11 @@
+[package]
+name = "example"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+capnpc-serde = {path="../../capnpc-serde"}
+serde_json = "1.0.99"
+tera = "1.19.0"

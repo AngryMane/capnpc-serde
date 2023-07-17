@@ -50,7 +50,7 @@ pub fn serialize_field(
 struct Group {
     field_type: String,
     name: String,
-    type_id: u64,
+    type_id: String,
     #[serde(flatten)]
     fields: serde_json::Value,
 }
@@ -119,7 +119,7 @@ impl Group {
         Ok(Group {
             field_type,
             name,
-            type_id: group.get_type_id(),
+            type_id: group.get_type_id().to_string(),
             fields,
         })
     }

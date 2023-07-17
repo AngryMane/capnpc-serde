@@ -98,6 +98,10 @@
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>capnp::schema_capnp::field;
 <span class="kw">use </span>capnp::schema_capnp::node;
 <span class="kw">use </span>capnpc::codegen::GeneratorContext;
@@ -134,6 +138,7 @@
     </span>common_node: CommonNode,
     is_union: bool,
     fields: Vec&lt;serde_json::Value&gt;,
+    union_fields: Vec&lt;serde_json::Value&gt;,
 }
 
 <span class="kw">impl </span>StructNode {
@@ -154,18 +159,21 @@
         <span class="kw">let </span>fields: Vec&lt;serde_json::Value&gt; = struct_
             .get_fields()<span class="question-mark">?
             </span>.iter()
+            .filter(|x| x.get_discriminant_value() == field::NO_DISCRIMINANT)
             .filter_map(|x| StructNode::create_field(cache, ctx, abs_file_path, <span class="kw-2">&amp;</span>x).ok())
             .collect();
-        <span class="kw">let </span>is_union = struct_
+        <span class="kw">let </span>union_fields: Vec&lt;serde_json::Value&gt; = struct_
             .get_fields()<span class="question-mark">?
             </span>.iter()
-            .find(|x| x.get_discriminant_value() != field::NO_DISCRIMINANT)
-            .map_or_else(|| <span class="bool-val">true</span>, |<span class="kw">_</span>| <span class="bool-val">false</span>);
-
+            .filter(|x| x.get_discriminant_value() != field::NO_DISCRIMINANT)
+            .filter_map(|x| StructNode::create_field(cache, ctx, abs_file_path, <span class="kw-2">&amp;</span>x).ok())
+            .collect();
+        <span class="kw">let </span>is_union = fields.is_empty();
         <span class="prelude-val">Ok</span>(StructNode {
             common_node,
             is_union,
             fields,
+            union_fields,
         })
     }
 
