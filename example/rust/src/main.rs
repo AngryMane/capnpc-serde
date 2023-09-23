@@ -16,8 +16,16 @@ fn main() {
         return;
     }
     let target_file_path = args[1].as_str();
+
+    let mut import_pathes: Vec<PathBuf> = vec![];
+    if args.len() == 3 {
+        let import_path = args[2].as_str();
+        let import_path = PathBuf::from(import_path);
+        import_pathes.push(import_path);
+    }
+
     let _a: Vec<PathBuf> = vec![];
-    let serialized: serde_json::Value = serialize_cap(target_file_path, false, &_a, &_a);
+    let serialized: serde_json::Value = serialize_cap(target_file_path, false, &import_pathes, &_a);
     render_file(serialized);
 }
 
