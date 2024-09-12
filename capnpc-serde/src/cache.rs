@@ -68,7 +68,26 @@ impl NodeCache {
         None
     }
 
-    pub fn push_brand_record(&mut self, struct_type: &type_::struct_::Reader) -> CapSerResult<()>{
+    pub fn push_interface_brand_record(&mut self, interface_type: &type_::interface::Reader) -> CapSerResult<()>{
+        let generics_struct= interface_type.get_brand()?.get_scopes()?.iter().filter(|x| x.get_scope_id() == interface_type.get_type_id()).next();
+        let generics_struct_id = interface_type.get_type_id();
+        let mut parameter_node_ids: Vec<Option<u64>> = Vec::new();
+        if let Some(a) = generics_struct {
+            match a.which()?{
+                brand::scope::Which::Bind(binding_list) => {
+                    for binding in binding_list? {
+                        parameter_node_ids.push(self.get_brand_id(binding)?);
+                    }
+                }
+                brand::scope::Which::Inherit(_) =>{ /* capnpc-serde must not fpollow this path*/ }
+            }
+        }
+
+        self.brand_replace_stack.push(BrandRecord  { struct_id: generics_struct_id, parameter_node_ids });
+        Ok(())
+    }
+
+    pub fn push_struct_brand_record(&mut self, struct_type: &type_::struct_::Reader) -> CapSerResult<()>{
         let generics_struct= struct_type.get_brand()?.get_scopes()?.iter().filter(|x| x.get_scope_id() == struct_type.get_type_id()).next();
         let generics_struct_id = struct_type.get_type_id();
         let mut parameter_node_ids: Vec<Option<u64>> = Vec::new();

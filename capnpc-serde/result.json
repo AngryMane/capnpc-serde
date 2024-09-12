@@ -153,6 +153,151 @@
       ],
       "union_fields": []
     },
+    "12531345149502871228": {
+      "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+      "annotations": [],
+      "base_name": "GenericsIF",
+      "id": "12531345149502871228",
+      "methods": [
+        {
+          "annotations": [],
+          "name": "testMessage",
+          "parameters": {
+            "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+            "annotations": [],
+            "base_name": "testMessage$Params",
+            "fields": [],
+            "id": "15909421758123975923",
+            "is_union": true,
+            "nested_nodes": [],
+            "node_type": "Struct",
+            "parent_id": "0",
+            "paths": [
+              "GenericsIF"
+            ],
+            "union_fields": []
+          },
+          "results": {
+            "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+            "annotations": [],
+            "base_name": "testMessage$Results",
+            "fields": [
+              {
+                "annotations": [],
+                "default_value": {},
+                "field_type": "Slot",
+                "has_default": true,
+                "is_interface": false,
+                "name": "result",
+                "type_": {
+                  "Struct": {
+                    "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                    "annotations": [
+                      {
+                        "base_name": "baz",
+                        "file_name": "testdata/sample.capnp",
+                        "paths": [],
+                        "value": {
+                          "Int32": 2
+                        }
+                      }
+                    ],
+                    "base_name": "Daty",
+                    "fields": [
+                      {
+                        "annotations": [],
+                        "default_value": {
+                          "Enum": 0
+                        },
+                        "field_type": "Slot",
+                        "has_default": true,
+                        "is_interface": false,
+                        "name": "year",
+                        "type_": {
+                          "Enum": {
+                            "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                            "annotations": [],
+                            "base_name": "EnumTest",
+                            "enum_names": [
+                              "foo",
+                              "bar",
+                              "baz",
+                              "qux"
+                            ],
+                            "id": "13941895613806012154",
+                            "nested_nodes": [],
+                            "node_type": "Enum",
+                            "parent_id": "10906726834602204116",
+                            "paths": [
+                              "Daty"
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "annotations": [],
+                        "default_value": {
+                          "Uint8": 0
+                        },
+                        "field_type": "Slot",
+                        "has_default": true,
+                        "is_interface": false,
+                        "name": "month",
+                        "type_": "Uint8"
+                      },
+                      {
+                        "annotations": [],
+                        "default_value": {
+                          "Uint8": 0
+                        },
+                        "field_type": "Slot",
+                        "has_default": true,
+                        "is_interface": false,
+                        "name": "day",
+                        "type_": "Uint8"
+                      },
+                      {
+                        "annotations": [],
+                        "default_value": {},
+                        "field_type": "Slot",
+                        "has_default": true,
+                        "is_interface": false,
+                        "name": "target",
+                        "type_": {
+                          "List": "Bool"
+                        }
+                      }
+                    ],
+                    "id": "10906726834602204116",
+                    "is_union": false,
+                    "nested_nodes": [
+                      "13941895613806012154"
+                    ],
+                    "node_type": "Struct",
+                    "parent_id": "17240271983398782667",
+                    "paths": [],
+                    "union_fields": []
+                  }
+                }
+              }
+            ],
+            "id": "9754898681266028945",
+            "is_union": false,
+            "nested_nodes": [],
+            "node_type": "Struct",
+            "parent_id": "0",
+            "paths": [
+              "GenericsIF"
+            ],
+            "union_fields": []
+          }
+        }
+      ],
+      "nested_nodes": [],
+      "node_type": "Interface",
+      "parent_id": "17240271983398782667",
+      "paths": []
+    },
     "13941895613806012154": {
       "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
       "annotations": [],
@@ -426,13 +571,159 @@
               {
                 "annotations": [],
                 "default_value": {
-                  "Bool": false
+                  "Interface": 0
                 },
                 "field_type": "Slot",
                 "has_default": true,
-                "is_interface": false,
+                "is_interface": true,
                 "name": "result",
-                "type_": "Bool"
+                "type_": {
+                  "Interface": {
+                    "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                    "annotations": [],
+                    "base_name": "GenericsIF",
+                    "id": "12531345149502871228",
+                    "methods": [
+                      {
+                        "annotations": [],
+                        "name": "testMessage",
+                        "parameters": {
+                          "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                          "annotations": [],
+                          "base_name": "testMessage$Params",
+                          "fields": [],
+                          "id": "15909421758123975923",
+                          "is_union": true,
+                          "nested_nodes": [],
+                          "node_type": "Struct",
+                          "parent_id": "0",
+                          "paths": [
+                            "GenericsIF"
+                          ],
+                          "union_fields": []
+                        },
+                        "results": {
+                          "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                          "annotations": [],
+                          "base_name": "testMessage$Results",
+                          "fields": [
+                            {
+                              "annotations": [],
+                              "default_value": {},
+                              "field_type": "Slot",
+                              "has_default": true,
+                              "is_interface": false,
+                              "name": "result",
+                              "type_": {
+                                "Struct": {
+                                  "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                                  "annotations": [
+                                    {
+                                      "base_name": "baz",
+                                      "file_name": "testdata/sample.capnp",
+                                      "paths": [],
+                                      "value": {
+                                        "Int32": 2
+                                      }
+                                    }
+                                  ],
+                                  "base_name": "Daty",
+                                  "fields": [
+                                    {
+                                      "annotations": [],
+                                      "default_value": {
+                                        "Enum": 0
+                                      },
+                                      "field_type": "Slot",
+                                      "has_default": true,
+                                      "is_interface": false,
+                                      "name": "year",
+                                      "type_": {
+                                        "Enum": {
+                                          "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                                          "annotations": [],
+                                          "base_name": "EnumTest",
+                                          "enum_names": [
+                                            "foo",
+                                            "bar",
+                                            "baz",
+                                            "qux"
+                                          ],
+                                          "id": "13941895613806012154",
+                                          "nested_nodes": [],
+                                          "node_type": "Enum",
+                                          "parent_id": "10906726834602204116",
+                                          "paths": [
+                                            "Daty"
+                                          ]
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "annotations": [],
+                                      "default_value": {
+                                        "Uint8": 0
+                                      },
+                                      "field_type": "Slot",
+                                      "has_default": true,
+                                      "is_interface": false,
+                                      "name": "month",
+                                      "type_": "Uint8"
+                                    },
+                                    {
+                                      "annotations": [],
+                                      "default_value": {
+                                        "Uint8": 0
+                                      },
+                                      "field_type": "Slot",
+                                      "has_default": true,
+                                      "is_interface": false,
+                                      "name": "day",
+                                      "type_": "Uint8"
+                                    },
+                                    {
+                                      "annotations": [],
+                                      "default_value": {},
+                                      "field_type": "Slot",
+                                      "has_default": true,
+                                      "is_interface": false,
+                                      "name": "target",
+                                      "type_": {
+                                        "List": "Bool"
+                                      }
+                                    }
+                                  ],
+                                  "id": "10906726834602204116",
+                                  "is_union": false,
+                                  "nested_nodes": [
+                                    "13941895613806012154"
+                                  ],
+                                  "node_type": "Struct",
+                                  "parent_id": "17240271983398782667",
+                                  "paths": [],
+                                  "union_fields": []
+                                }
+                              }
+                            }
+                          ],
+                          "id": "9754898681266028945",
+                          "is_union": false,
+                          "nested_nodes": [],
+                          "node_type": "Struct",
+                          "parent_id": "0",
+                          "paths": [
+                            "GenericsIF"
+                          ],
+                          "union_fields": []
+                        }
+                      }
+                    ],
+                    "nested_nodes": [],
+                    "node_type": "Interface",
+                    "parent_id": "17240271983398782667",
+                    "paths": []
+                  }
+                }
               }
             ],
             "id": "18444498328072804895",
@@ -589,6 +880,21 @@
       "node_type": "File",
       "parent_id": "0",
       "paths": []
+    },
+    "15909421758123975923": {
+      "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+      "annotations": [],
+      "base_name": "testMessage$Params",
+      "fields": [],
+      "id": "15909421758123975923",
+      "is_union": true,
+      "nested_nodes": [],
+      "node_type": "Struct",
+      "parent_id": "0",
+      "paths": [
+        "GenericsIF"
+      ],
+      "union_fields": []
     },
     "15996988990095801931": {
       "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
@@ -920,6 +1226,7 @@
         "10187181835410055502",
         "15068556848543076674",
         "15732677898478213346",
+        "12531345149502871228",
         "10906726834602204116"
       ],
       "node_type": "File",
@@ -996,13 +1303,159 @@
         {
           "annotations": [],
           "default_value": {
-            "Bool": false
+            "Interface": 0
           },
           "field_type": "Slot",
           "has_default": true,
-          "is_interface": false,
+          "is_interface": true,
           "name": "result",
-          "type_": "Bool"
+          "type_": {
+            "Interface": {
+              "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+              "annotations": [],
+              "base_name": "GenericsIF",
+              "id": "12531345149502871228",
+              "methods": [
+                {
+                  "annotations": [],
+                  "name": "testMessage",
+                  "parameters": {
+                    "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                    "annotations": [],
+                    "base_name": "testMessage$Params",
+                    "fields": [],
+                    "id": "15909421758123975923",
+                    "is_union": true,
+                    "nested_nodes": [],
+                    "node_type": "Struct",
+                    "parent_id": "0",
+                    "paths": [
+                      "GenericsIF"
+                    ],
+                    "union_fields": []
+                  },
+                  "results": {
+                    "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                    "annotations": [],
+                    "base_name": "testMessage$Results",
+                    "fields": [
+                      {
+                        "annotations": [],
+                        "default_value": {},
+                        "field_type": "Slot",
+                        "has_default": true,
+                        "is_interface": false,
+                        "name": "result",
+                        "type_": {
+                          "Struct": {
+                            "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                            "annotations": [
+                              {
+                                "base_name": "baz",
+                                "file_name": "testdata/sample.capnp",
+                                "paths": [],
+                                "value": {
+                                  "Int32": 2
+                                }
+                              }
+                            ],
+                            "base_name": "Daty",
+                            "fields": [
+                              {
+                                "annotations": [],
+                                "default_value": {
+                                  "Enum": 0
+                                },
+                                "field_type": "Slot",
+                                "has_default": true,
+                                "is_interface": false,
+                                "name": "year",
+                                "type_": {
+                                  "Enum": {
+                                    "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                                    "annotations": [],
+                                    "base_name": "EnumTest",
+                                    "enum_names": [
+                                      "foo",
+                                      "bar",
+                                      "baz",
+                                      "qux"
+                                    ],
+                                    "id": "13941895613806012154",
+                                    "nested_nodes": [],
+                                    "node_type": "Enum",
+                                    "parent_id": "10906726834602204116",
+                                    "paths": [
+                                      "Daty"
+                                    ]
+                                  }
+                                }
+                              },
+                              {
+                                "annotations": [],
+                                "default_value": {
+                                  "Uint8": 0
+                                },
+                                "field_type": "Slot",
+                                "has_default": true,
+                                "is_interface": false,
+                                "name": "month",
+                                "type_": "Uint8"
+                              },
+                              {
+                                "annotations": [],
+                                "default_value": {
+                                  "Uint8": 0
+                                },
+                                "field_type": "Slot",
+                                "has_default": true,
+                                "is_interface": false,
+                                "name": "day",
+                                "type_": "Uint8"
+                              },
+                              {
+                                "annotations": [],
+                                "default_value": {},
+                                "field_type": "Slot",
+                                "has_default": true,
+                                "is_interface": false,
+                                "name": "target",
+                                "type_": {
+                                  "List": "Bool"
+                                }
+                              }
+                            ],
+                            "id": "10906726834602204116",
+                            "is_union": false,
+                            "nested_nodes": [
+                              "13941895613806012154"
+                            ],
+                            "node_type": "Struct",
+                            "parent_id": "17240271983398782667",
+                            "paths": [],
+                            "union_fields": []
+                          }
+                        }
+                      }
+                    ],
+                    "id": "9754898681266028945",
+                    "is_union": false,
+                    "nested_nodes": [],
+                    "node_type": "Struct",
+                    "parent_id": "0",
+                    "paths": [
+                      "GenericsIF"
+                    ],
+                    "union_fields": []
+                  }
+                }
+              ],
+              "nested_nodes": [],
+              "node_type": "Interface",
+              "parent_id": "17240271983398782667",
+              "paths": []
+            }
+          }
         }
       ],
       "id": "18444498328072804895",
@@ -1012,6 +1465,120 @@
       "parent_id": "0",
       "paths": [
         "Sample"
+      ],
+      "union_fields": []
+    },
+    "9754898681266028945": {
+      "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+      "annotations": [],
+      "base_name": "testMessage$Results",
+      "fields": [
+        {
+          "annotations": [],
+          "default_value": {},
+          "field_type": "Slot",
+          "has_default": true,
+          "is_interface": false,
+          "name": "result",
+          "type_": {
+            "Struct": {
+              "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+              "annotations": [
+                {
+                  "base_name": "baz",
+                  "file_name": "testdata/sample.capnp",
+                  "paths": [],
+                  "value": {
+                    "Int32": 2
+                  }
+                }
+              ],
+              "base_name": "Daty",
+              "fields": [
+                {
+                  "annotations": [],
+                  "default_value": {
+                    "Enum": 0
+                  },
+                  "field_type": "Slot",
+                  "has_default": true,
+                  "is_interface": false,
+                  "name": "year",
+                  "type_": {
+                    "Enum": {
+                      "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                      "annotations": [],
+                      "base_name": "EnumTest",
+                      "enum_names": [
+                        "foo",
+                        "bar",
+                        "baz",
+                        "qux"
+                      ],
+                      "id": "13941895613806012154",
+                      "nested_nodes": [],
+                      "node_type": "Enum",
+                      "parent_id": "10906726834602204116",
+                      "paths": [
+                        "Daty"
+                      ]
+                    }
+                  }
+                },
+                {
+                  "annotations": [],
+                  "default_value": {
+                    "Uint8": 0
+                  },
+                  "field_type": "Slot",
+                  "has_default": true,
+                  "is_interface": false,
+                  "name": "month",
+                  "type_": "Uint8"
+                },
+                {
+                  "annotations": [],
+                  "default_value": {
+                    "Uint8": 0
+                  },
+                  "field_type": "Slot",
+                  "has_default": true,
+                  "is_interface": false,
+                  "name": "day",
+                  "type_": "Uint8"
+                },
+                {
+                  "annotations": [],
+                  "default_value": {},
+                  "field_type": "Slot",
+                  "has_default": true,
+                  "is_interface": false,
+                  "name": "target",
+                  "type_": {
+                    "List": "Bool"
+                  }
+                }
+              ],
+              "id": "10906726834602204116",
+              "is_union": false,
+              "nested_nodes": [
+                "13941895613806012154"
+              ],
+              "node_type": "Struct",
+              "parent_id": "17240271983398782667",
+              "paths": [],
+              "union_fields": []
+            }
+          }
+        }
+      ],
+      "id": "9754898681266028945",
+      "is_union": false,
+      "nested_nodes": [],
+      "node_type": "Struct",
+      "parent_id": "0",
+      "paths": [
+        "GenericsIF"
       ],
       "union_fields": []
     }

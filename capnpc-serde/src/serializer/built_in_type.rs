@@ -59,15 +59,17 @@ fn serialize_type_internal(
         }
         type_::Which::Struct(struct_type) => {
             let mut ret = HashMap::new();
-            cache.push_brand_record(struct_type)?;
+            cache.push_struct_brand_record(struct_type)?;
             let value = serialize_node(cache, ctx, struct_type.get_type_id(), abs_file_path)?;
             cache.pop_brand_record();
             ret.insert("Struct", value);
             Ok(serde_json::to_value(ret)?)
         }
-        type_::Which::Interface(interface_var) => {
+        type_::Which::Interface(interface_type) => {
             let mut ret = HashMap::new();
-            let value: serde_json::Value = serialize_node(cache, ctx, interface_var.get_type_id(), abs_file_path)?;
+            cache.push_interface_brand_record(interface_type)?;
+            let value: serde_json::Value = serialize_node(cache, ctx, interface_type.get_type_id(), abs_file_path)?;
+            cache.pop_brand_record();
             ret.insert("Interface", value);
             Ok(serde_json::to_value(ret)?)
         }

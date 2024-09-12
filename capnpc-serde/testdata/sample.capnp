@@ -9,7 +9,7 @@ $note("annotation to file");
 
 
 interface Sample {
-    initialize @0 (debug: Bool) -> (result: Bool);
+    initialize @0 (debug: Bool) -> (result: GenericsIF(Daty));
 
     interface Subscriber {
         pushMessage @0 () -> (result: Bool);
@@ -18,6 +18,9 @@ interface Sample {
     subscribe @1 (subscriber: Subscriber) -> (result: Bool);
 }
 
+interface GenericsIF(T) {
+    testMessage @0 () -> (result: T);
+}
 
 struct Daty $baz(2) {
   enum EnumTest {
