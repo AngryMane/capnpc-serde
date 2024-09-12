@@ -31,6 +31,7 @@ pub fn serialize_interface(
 struct InterfaceNode {
     #[serde(flatten)]
     common_node: CommonNode,
+    brands: Vec<serde_json::Value>,
     methods: Vec<serde_json::Value>,
 }
 
@@ -49,6 +50,13 @@ impl InterfaceNode {
             return Err(CapSerError::new("This is not interface node."));
         };
 
+        let mut brands = Vec::new(); 
+        if let Some(resolved_brands) = cache.resolve_brands(id){
+            for serialized_brand in resolved_brands.iter() {
+                brands.push(serialized_brand.clone());
+            }
+        }
+
         let methods: Vec<serde_json::Value> = interface
             .get_methods()?
             .into_iter()
@@ -57,6 +65,7 @@ impl InterfaceNode {
 
         Ok(InterfaceNode {
             common_node,
+            brands,
             methods,
         })
     }

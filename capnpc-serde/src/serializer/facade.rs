@@ -52,6 +52,7 @@ pub fn serialize_node(
     if let Some(value) = cache.get_node(&node_id) {
         return Ok(value);
     }
+
     debug!("{}:{} serialize_node called", file!(), line!());
     let node = ctx.node_map[&node_id];
     let result = match node.which()? {

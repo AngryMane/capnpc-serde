@@ -33,6 +33,7 @@ struct StructNode {
     #[serde(flatten)]
     common_node: CommonNode,
     is_union: bool,
+    brands: Vec<serde_json::Value>,
     fields: Vec<serde_json::Value>,
     union_fields: Vec<serde_json::Value>,
 }
@@ -52,6 +53,13 @@ impl StructNode {
             return Err(CapSerError::new("This is not struct node."));
         };
 
+        let mut brands = Vec::new(); 
+        if let Some(resolved_brands) = cache.resolve_brands(id){
+            for serialized_brand in resolved_brands.iter() {
+                brands.push(serialized_brand.clone());
+            }
+        }
+
         let fields: Vec<serde_json::Value> = struct_
             .get_fields()?
             .iter()
@@ -68,6 +76,7 @@ impl StructNode {
         Ok(StructNode {
             common_node,
             is_union,
+            brands,
             fields,
             union_fields,
         })

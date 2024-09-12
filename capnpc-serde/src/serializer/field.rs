@@ -1,7 +1,9 @@
 use capnp::schema_capnp::field;
 use capnp::schema_capnp::type_;
 use capnpc::codegen::GeneratorContext;
+use capnpc::codegen_types::RustTypeInfo;
 use log::debug;
+use std::any::Any;
 use std::fmt;
 use std::path::PathBuf;
 

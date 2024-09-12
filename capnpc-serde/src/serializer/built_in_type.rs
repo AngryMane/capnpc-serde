@@ -1,7 +1,9 @@
 use capnp::schema_capnp::type_;
+use capnp::schema_capnp::brand;
 use capnpc::codegen::GeneratorContext;
 use log::debug;
 use std::collections::HashMap;
+use std::fmt::Debug;
 use std::path::PathBuf;
 
 use crate::cache;
@@ -59,7 +61,8 @@ fn serialize_type_internal(
         }
         type_::Which::Struct(struct_type) => {
             let mut ret = HashMap::new();
-            cache.push_struct_brand_record(struct_type)?;
+            let serialized_brands = serialize_struct_brands(cache, ctx, struct_type, abs_file_path)?;
+            cache.push_struct_brand_record(struct_type, serialized_brands);
             let value = serialize_node(cache, ctx, struct_type.get_type_id(), abs_file_path)?;
             cache.pop_brand_record();
             ret.insert("Struct", value);
@@ -67,7 +70,8 @@ fn serialize_type_internal(
         }
         type_::Which::Interface(interface_type) => {
             let mut ret = HashMap::new();
-            cache.push_interface_brand_record(interface_type)?;
+            let serialized_brands = serialize_interface_brands(cache, ctx, interface_type, abs_file_path)?;
+            cache.push_interface_brand_record(interface_type, serialized_brands);
             let value: serde_json::Value = serialize_node(cache, ctx, interface_type.get_type_id(), abs_file_path)?;
             cache.pop_brand_record();
             ret.insert("Interface", value);
@@ -77,10 +81,10 @@ fn serialize_type_internal(
             match a.which()? {
                 type_::any_pointer::Which::Unconstrained(_) => {},
                 type_::any_pointer::Which::Parameter(a1) => {
-                    if let Some(node_id) = cache.resolve_brand(a1.get_scope_id(), a1.get_parameter_index() as usize){
+                    if let Some(serialized_brand) = cache.resolve_brand(a1.get_scope_id(), a1.get_parameter_index() as usize){
                         let mut ret = HashMap::new();
-                        let value = serialize_node(cache, ctx, node_id, abs_file_path)?;
-                        ret.insert("Struct", value);
+                        let node_type = serialized_brand["node_type"].to_string();
+                        ret.insert(node_type, serialized_brand);
                         return Ok(serde_json::to_value(ret)?);
                     } 
                 },
@@ -89,5 +93,70 @@ fn serialize_type_internal(
             Ok(serde_json::to_value("AnyPointer")?)
         },
     }
+}
 
+fn serialize_struct_brands(
+    cache: &mut cache::NodeCache,
+    ctx: &GeneratorContext,
+    struct_type: &type_::struct_::Reader,
+    abs_file_path: &PathBuf,
+) -> CapSerResult<Option<Vec<serde_json::Value>>> {
+    let generics_struct= struct_type.get_brand()?.get_scopes()?.iter().filter(|x| x.get_scope_id() == struct_type.get_type_id()).next();
+    let mut serialized_brands = Vec::new();
+    if let Some(a) = generics_struct {
+        match a.which()?{
+            brand::scope::Which::Bind(binding_list) => {
+                for binding in binding_list? {
+                    serialized_brands.push(serialize_brand(cache, ctx, binding, &abs_file_path)?);
+                }
+            }
+            brand::scope::Which::Inherit(_) =>{ /* capnpc-serde must not fpollow this path*/ }
+        }
+    }
+
+    if serialized_brands.is_empty() {
+        return Ok(None);
+    }
+    Ok(Some(serialized_brands))
+}
+
+fn serialize_interface_brands(
+    cache: &mut cache::NodeCache,
+    ctx: &GeneratorContext,
+    interface_type: &type_::interface::Reader,
+    abs_file_path: &PathBuf,
+) -> CapSerResult<Option<Vec<serde_json::Value>>> {
+    let generics_struct= interface_type.get_brand()?.get_scopes()?.iter().filter(|x| x.get_scope_id() == interface_type.get_type_id()).next();
+    let mut serialized_brands = Vec::new();
+    if let Some(a) = generics_struct {
+        match a.which()?{
+            brand::scope::Which::Bind(binding_list) => {
+                for binding in binding_list? {
+                    serialized_brands.push(serialize_brand(cache, ctx, binding, &abs_file_path)?);
+                }
+            }
+            brand::scope::Which::Inherit(_) =>{ /* capnpc-serde must not fpollow this path*/ }
+        }
+    }
+
+    if serialized_brands.is_empty() {
+        return Ok(None);
+    }
+    Ok(Some(serialized_brands))
+}
+
+fn serialize_brand(
+    cache: &mut cache::NodeCache,
+    ctx: &GeneratorContext,
+    brand: brand::binding::Reader,
+    abs_file_path: &PathBuf,
+) -> CapSerResult<serde_json::Value> {
+    let result = match brand.which()? {
+        brand::binding::Unbound(()) => { None }
+        brand::binding::Type(t) => {
+            Some(serialize_type_internal(cache, ctx, &t?.which()?, abs_file_path)?)
+        }
+    };
+
+    Ok(result.unwrap())
 }
