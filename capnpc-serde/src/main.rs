@@ -62,6 +62,7 @@ fn __serialize(args: &Args) -> HashMap<String, serde_json::Value> {
     let mut cache = cache::NodeCache {
         node_id_stack: Vec::new(),
         node_map: HashMap::new(),
+        brand_replace_stack: Vec::new()
     };
     let root = serialize(
         &mut cache,

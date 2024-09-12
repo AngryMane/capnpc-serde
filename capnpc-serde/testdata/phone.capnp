@@ -2,7 +2,7 @@
 
 struct Person {
   name @0 :Text;
-  birthdate @3 :Date;
+  birthdate @3 :Date(Dymmy);
 
   email @1 :Text;
   phones @2 :List(PhoneNumber);
@@ -19,8 +19,12 @@ struct Person {
   }
 }
 
-struct Date {
-  year @0 :Int16;
+struct Dymmy {
+  year @0 :UInt16;
+}
+
+struct Date (YEARTYPE) {
+  year @0 :YEARTYPE;
   month @1 :UInt8;
   day @2 :UInt8;
 }

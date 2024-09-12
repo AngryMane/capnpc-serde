@@ -21,7 +21,7 @@ pub fn serialize_const(
     abs_file_path: &PathBuf,
 ) -> CapSerResult<serde_json::Value> {
     debug!("{}:{} serialize_const called", file!(), line!());
-    if !cache.start_parse_node(id) {
+    if !cache.start_parse_node(ctx, id)? {
         return Ok(serde_json::to_value(id.to_string())?);
     }
     let ret = ConstNode::new(cache, ctx, id, abs_file_path)?;

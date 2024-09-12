@@ -20,7 +20,7 @@ pub fn serialize_struct(
     abs_file_path: &PathBuf,
 ) -> CapSerResult<serde_json::Value> {
     debug!("{}:{} serialize_struct called", file!(), line!());
-    if !cache.start_parse_node(id) {
+    if !cache.start_parse_node(ctx, id)? {
         return Ok(serde_json::to_value(id.to_string())?);
     }
     let ret = StructNode::new(cache, ctx, id, abs_file_path)?;

@@ -57,18 +57,35 @@ fn serialize_type_internal(
             ret.insert("Enum", value);
             Ok(serde_json::to_value(ret)?)
         }
-        type_::Which::Struct(struct_var) => {
+        type_::Which::Struct(struct_type) => {
             let mut ret = HashMap::new();
-            let value = serialize_node(cache, ctx, struct_var.get_type_id(), abs_file_path)?;
+            cache.push_brand_record(struct_type)?;
+            let value = serialize_node(cache, ctx, struct_type.get_type_id(), abs_file_path)?;
+            cache.pop_brand_record();
             ret.insert("Struct", value);
             Ok(serde_json::to_value(ret)?)
         }
         type_::Which::Interface(interface_var) => {
             let mut ret = HashMap::new();
-            let value = serialize_node(cache, ctx, interface_var.get_type_id(), abs_file_path)?;
+            let value: serde_json::Value = serialize_node(cache, ctx, interface_var.get_type_id(), abs_file_path)?;
             ret.insert("Interface", value);
             Ok(serde_json::to_value(ret)?)
         }
-        type_::Which::AnyPointer(_) => Ok(serde_json::to_value("AnyPointer")?),
+        type_::Which::AnyPointer(a) => {
+            match a.which()? {
+                type_::any_pointer::Which::Unconstrained(_) => {},
+                type_::any_pointer::Which::Parameter(a1) => {
+                    if let Some(node_id) = cache.resolve_brand(a1.get_scope_id(), a1.get_parameter_index() as usize){
+                        let mut ret = HashMap::new();
+                        let value = serialize_node(cache, ctx, node_id, abs_file_path)?;
+                        ret.insert("Struct", value);
+                        return Ok(serde_json::to_value(ret)?);
+                    } 
+                },
+                type_::any_pointer::Which::ImplicitMethodParameter(_) => {},
+            }
+            Ok(serde_json::to_value("AnyPointer")?)
+        },
     }
+
 }
