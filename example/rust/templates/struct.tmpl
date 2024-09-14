@@ -18,24 +18,41 @@
 {# extract_relationship #}
 {########################}
 {%- macro extract_relationship(parent_name, field) -%}
-{%- if field.field_type == "Slot" -%}
-{%- if field.type_ is object -%}
-{%- if field.type_ is containing("List") -%}
-{%- set payload_type = self::extract_payload_type_of_list(list=field.type_) -%}
-{%- if payload_type | length > 0 -%}
-{{parent_name}} --> {{ payload_type }} : Refernce
-{% endif -%}
-{% else -%}
-{%- set payload_type = get_complex_type_name(complex_type=field.type_) -%}
-{%- if payload_type | length > 0 -%}
-{{parent_name}} --> {{ payload_type }} : Refernce
-{% endif -%}
-{% endif -%}
-{% endif -%}
-{%- endif -%}
-{%- if field.field_type == "Group" -%}
-{{parent_name}} *-- {{ get_name_by_id(id=field.type_id) }} : Group
-{% endif -%}
+    {%- if field.field_type == "Slot" -%}
+        {%- if field.type_ is object -%}
+            {%- if field.type_ is containing("List") -%}
+                {%- set payload_type = self::extract_payload_type_of_list(list=field.type_) -%}
+                {%- if payload_type | length > 0 -%}
+                    {{parent_name}} --> {{ payload_type }} : Refernce
+                {% endif -%}
+            {% else -%}
+                {%- set payload_type = get_complex_type_name(complex_type=field.type_) -%}
+                {%- if payload_type | length > 0 -%}
+                    {{parent_name}} --> {{ payload_type }} : Refernce
+                {% endif -%}
+
+                {%- if field.type_ is containing("Struct") -%}
+                    {%- for brand in field.type_.Struct.generics -%}
+                        {%- set payload_type = get_complex_type_name(complex_type=brand, resolve_generics=false) -%}
+                        {%- if payload_type | length > 0 -%}
+                            {{parent_name}} --> {{ payload_type }} : Refernce
+                        {% endif -%}
+                    {%- endfor -%}
+                {% endif -%}
+                {%- if field.type_ is containing("Interface") -%}
+                    {%- for brand in field.type_.Interface.generics -%}
+                        {%- set payload_type = get_complex_type_name(complex_type=brand, resolve_generics=false) -%}
+                        {%- if payload_type | length > 0 -%}
+                            {{parent_name}} --> {{ payload_type }} : Refernce
+                        {% endif -%}
+                    {%- endfor -%}
+                {% endif -%}
+            {% endif -%}
+        {% endif -%}
+    {%- endif -%}
+    {%- if field.field_type == "Group" -%}
+        {{parent_name}} *-- {{ get_name_by_id(id=field.type_id) }} : Group
+    {% endif -%}
 {%- endmacro extract_relationship -%}
 
 {################}

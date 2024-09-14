@@ -12,7 +12,7 @@ interface Example extends(Sample) {
 }
 
 interface Sample {
-    initialize @0 (debug: Bool) -> (result: GenericsIF(Daty));
+    initialize @0 (debug: Phone.Date(Daty) ) -> (result: GenericsIF(Daty));
 
     interface Subscriber {
         pushMessage @0 () -> (result: Bool);
