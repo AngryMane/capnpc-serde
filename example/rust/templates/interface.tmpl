@@ -24,18 +24,18 @@
 {%- if field.type_ is containing("List") -%}
 {%- set payload_type = self::extract_payload_type_of_list(list=field.type_) -%}
 {%- if payload_type | length > 0 -%}
-{{parent_name}} --> {{ payload_type }}
+{{parent_name}} --> {{ payload_type }} : Reference
 {% endif -%}
 {% else -%}
 {%- set payload_type = get_complex_type_name(complex_type=field.type_, resolve_generics=false) -%}
 {%- if payload_type | length > 0 -%}
-{{parent_name}} --> {{ payload_type }}
+{{parent_name}} --> {{ payload_type }} : Reference
 {% endif -%}
 {% endif -%}
 {% endif -%}
 {%- endif -%}
 {%- if field.field_type == "Group" -%}
-{{parent_name}} *-- {{ get_name_by_id(id=field.type_id) }}
+{{parent_name}} *-- {{ get_name_by_id(id=field.type_id) }} : Group
 {% endif -%}
 {%- endmacro extract_relationship -%}
 
