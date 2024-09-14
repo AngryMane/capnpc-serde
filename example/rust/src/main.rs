@@ -1,7 +1,7 @@
 use capnpc_serde::*;
 use std::path::PathBuf;
-use std::env;
 use serde_json;
+use clap::Parser;
 
 use tera::Tera;
 use tera::Context;
@@ -9,23 +9,35 @@ use std::collections::HashMap;
 use tera::Value;
 use std::sync::Arc;
 
+#[derive(Parser, Debug)]
+struct Args {
+    /// the path to the target capn'proto schema file
+    target_file_path: String,
+    /// whether to output to file. The default value is None, and does not output as a file.
+    #[arg(short, long, default_value=None)]
+    output_file_path: Option<String>,
+    /// whether to import the standard path("/usr/local/include" and "/usr/include") or not
+    #[arg(short, long, default_value_t = false)]
+    no_standard_import: bool,
+    /// paths to the capn' proto schema files you want to import from the target schema
+    #[arg(short, long, default_values_t = Vec::<String>::new(), num_args(0..))]
+    import_paths: Vec<String>,
+    /// prefixes of the schema file
+    #[arg(short, long, default_values_t = Vec::<String>::new(), num_args(0..))]
+    src_prefixes: Vec<String>,
+}
+
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args.len() == 1 {
-        println!("This sample needs target schema file path as an argument.");
-        return;
-    }
-    let target_file_path = args[1].as_str();
-
-    let mut import_pathes: Vec<PathBuf> = vec![];
-    if args.len() == 3 {
-        let import_path = args[2].as_str();
-        let import_path = PathBuf::from(import_path);
-        import_pathes.push(import_path);
-    }
-
-    let _a: Vec<PathBuf> = vec![];
-    let serialized: serde_json::Value = serialize_cap(target_file_path, false, &import_pathes, &_a);
+    let args = Args::parse();
+    //let args: Vec<String> = env::args().collect();
+    //if args.len() == 1 {
+    //    println!("This sample needs target schema file path as an argument.");
+    //    return;
+    //}
+    let target_file_path = &args.target_file_path;
+    let import_pathes: Vec<PathBuf> = args.import_paths.iter().map(|x| PathBuf::from(x)).collect();
+    let _a: Vec<PathBuf> = args.src_prefixes.iter().map(|x| PathBuf::from(x)).collect();
+    let serialized: serde_json::Value = serialize_cap(target_file_path, args.no_standard_import, &import_pathes, &_a);
     render_file(serialized);
 }
 
