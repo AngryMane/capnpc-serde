@@ -2,14 +2,14 @@
 {# render_field #}
 {################}
 {%- macro render_field(parent_name, field) -%}
-{%- if field.field_type == "Slot" -%}
-{%- if field.type_ is object -%}
-`{{parent_name}}` : {{ get_complex_type_name(complex_type=field.type_) }} {{ field.name }} 
-{%- else -%}
-`{{parent_name}}` : {{ field.type_ }} {{ field.name }} 
-{%- endif -%}
-{%- endif -%}
-{%- if field.field_type == "Group" -%}
-`{{parent_name}}` : {{ get_name_by_id(id=field.type_id) }} {{ field.name }} 
-{%- endif -%}
+    {%- if field.field_type == "Slot" -%}
+        {%- if field.type_ is object -%}
+            `{{parent_name}}` : {{ get_complex_type_name(complex_type=field.type_) }} {{ field.name }} 
+        {%- else -%}
+            `{{parent_name}}` : {{ field.type_ }} {{ field.name }} 
+        {%- endif -%}
+    {%- endif -%}
+    {%- if field.field_type == "Group" -%}
+        `{{parent_name}}` : {{ get_name_by_id(id=field.type_id) }} {{ field.name }} 
+    {%- endif -%}
 {%- endmacro render_field -%}

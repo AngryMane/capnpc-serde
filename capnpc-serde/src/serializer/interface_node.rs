@@ -50,12 +50,8 @@ impl InterfaceNode {
             return Err(CapSerError::new("This is not interface node."));
         };
 
-        let mut brands = Vec::new(); 
-        if let Some(resolved_brands) = cache.resolve_brands(id){
-            for serialized_brand in resolved_brands.iter() {
-                brands.push(serialized_brand.clone());
-            }
-        }
+        //TODO:
+        let brands = Vec::new(); 
 
         let methods: Vec<serde_json::Value> = interface
             .get_methods()?

@@ -3,12 +3,23 @@ use capnp::schema_capnp::brand;
 use capnpc::codegen::GeneratorContext;
 use log::debug;
 use std::collections::HashMap;
-use std::fmt::Debug;
 use std::path::PathBuf;
 
 use crate::cache;
 use crate::error_handler::*;
-use crate::serializer::facade::*;
+use serde::Serialize;
+
+#[derive(Serialize)]
+struct NodeReference {
+    id: u64,
+    generics: Vec<serde_json::Value>,
+}
+
+#[derive(Serialize)]
+struct AnyPointer {
+    branded_node_id: u64,
+    brand_index: usize, 
+}
 
 pub fn serialize_type(
     cache: &mut cache::NodeCache,
@@ -54,39 +65,59 @@ fn serialize_type_internal(
             Ok(serde_json::to_value(ret)?)
         }
         type_::Which::Enum(enum_var) => {
+            //let mut ret = HashMap::new();
+            //let value = serialize_node(cache, ctx, enum_var.get_type_id(), abs_file_path)?;
+            //ret.insert("Enum", value);
+            //Ok(serde_json::to_value(ret)?)
             let mut ret = HashMap::new();
-            let value = serialize_node(cache, ctx, enum_var.get_type_id(), abs_file_path)?;
-            ret.insert("Enum", value);
+            let complex_type = NodeReference { id: enum_var.get_type_id(), generics: vec![]};
+            ret.insert("Enum", complex_type);
             Ok(serde_json::to_value(ret)?)
         }
         type_::Which::Struct(struct_type) => {
+            //let mut ret = HashMap::new();
+            //let serialized_brands = serialize_struct_brands(cache, ctx, struct_type, abs_file_path)?;
+            //cache.push_struct_brand_record(struct_type, serialized_brands);
+            //let value = serialize_node(cache, ctx, struct_type.get_type_id(), abs_file_path)?;
+            //cache.pop_brand_record();
+            //ret.insert("Struct", value);
+            //Ok(serde_json::to_value(ret)?)
             let mut ret = HashMap::new();
             let serialized_brands = serialize_struct_brands(cache, ctx, struct_type, abs_file_path)?;
-            cache.push_struct_brand_record(struct_type, serialized_brands);
-            let value = serialize_node(cache, ctx, struct_type.get_type_id(), abs_file_path)?;
-            cache.pop_brand_record();
-            ret.insert("Struct", value);
+            let serialized_brands = if let Some(velue) = serialized_brands { velue } else {vec![]};
+            let complex_type = NodeReference { id: struct_type.get_type_id(), generics: serialized_brands };
+            ret.insert("Struct", complex_type);
             Ok(serde_json::to_value(ret)?)
         }
         type_::Which::Interface(interface_type) => {
+            //let mut ret = HashMap::new();
+            //let serialized_brands = serialize_interface_brands(cache, ctx, interface_type, abs_file_path)?;
+            //cache.push_interface_brand_record(interface_type, serialized_brands);
+            //let value: serde_json::Value = serialize_node(cache, ctx, interface_type.get_type_id(), abs_file_path)?;
+            //cache.pop_brand_record();
+            //ret.insert("Interface", value);
+            //Ok(serde_json::to_value(ret)?)
             let mut ret = HashMap::new();
             let serialized_brands = serialize_interface_brands(cache, ctx, interface_type, abs_file_path)?;
-            cache.push_interface_brand_record(interface_type, serialized_brands);
-            let value: serde_json::Value = serialize_node(cache, ctx, interface_type.get_type_id(), abs_file_path)?;
-            cache.pop_brand_record();
-            ret.insert("Interface", value);
+            let serialized_brands = if let Some(velue) = serialized_brands { velue } else {vec![]};
+            let complex_type = NodeReference { id: interface_type.get_type_id(), generics: serialized_brands };
+            ret.insert("Interface", complex_type);
             Ok(serde_json::to_value(ret)?)
         }
         type_::Which::AnyPointer(a) => {
             match a.which()? {
                 type_::any_pointer::Which::Unconstrained(_) => {},
                 type_::any_pointer::Which::Parameter(a1) => {
-                    if let Some(serialized_brand) = cache.resolve_brand(a1.get_scope_id(), a1.get_parameter_index() as usize){
-                        let mut ret = HashMap::new();
-                        let node_type = serialized_brand["node_type"].to_string();
-                        ret.insert(node_type, serialized_brand);
-                        return Ok(serde_json::to_value(ret)?);
-                    } 
+                    //if let Some(serialized_brand) = cache.resolve_brand(a1.get_scope_id(), a1.get_parameter_index() as usize){
+                    //    let mut ret = HashMap::new();
+                    //    let node_type = serialized_brand["node_type"].to_string();
+                    //    ret.insert(node_type, serialized_brand);
+                    //    return Ok(serde_json::to_value(ret)?);
+                    //} 
+                    let mut ret = HashMap::new();
+                    let brand_data = AnyPointer {branded_node_id: a1.get_scope_id(), brand_index: a1.get_parameter_index() as usize};
+                    ret.insert("AnyPointer", brand_data);
+                    return Ok(serde_json::to_value(ret)?);
                 },
                 type_::any_pointer::Which::ImplicitMethodParameter(_) => {},
             }

@@ -27,7 +27,7 @@
                     {{parent_name}} --> {{ payload_type }}
                 {% endif -%}
             {% else -%}
-                {%- set payload_type = get_complex_type_name(complex_type=field.type_) -%}
+                {%- set payload_type = get_complex_type_name(complex_type=field.type_, include_generics=false) -%}
                 {%- if payload_type | length > 0 -%}
                     {{parent_name}} --> {{ payload_type }}
                 {% endif -%}

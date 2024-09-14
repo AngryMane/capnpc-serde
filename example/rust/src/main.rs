@@ -1,4 +1,5 @@
 use capnpc_serde::*;
+use std::iter;
 use std::path::PathBuf;
 use std::env;
 use serde_json;
@@ -93,36 +94,90 @@ fn get_complex_type_name(cache: Arc<serde_json::Value>) -> impl tera::Function {
     Box::new(move |args: &HashMap<String, Value>| -> tera::Result<Value> {
         let cache = Arc::clone(&cache);
         let complex_type = args["complex_type"].as_object().unwrap();
-        let name = get_complex_type_name_internal(cache, complex_type );
+        let include_generics = if let Some(a) = args.get("include_generics") { a.as_bool() } else { Some(true) } ;
+        let include_generics = if let Some(a)= include_generics { a } else { true };
+        let name = get_complex_type_name_internal(cache, complex_type, include_generics);
         return Ok(tera::to_value(name).unwrap());
     })
 }
 
-fn get_complex_type_name_internal(cache: Arc<serde_json::Value>, complex_type: &serde_json::Map<String, Value>) -> String {
+fn get_complex_type_name_internal(cache: Arc<serde_json::Value>, complex_type: &serde_json::Map<String, Value>, include_generics: bool) -> String {
     if let Some(list_value) = complex_type.get("List"){
         if let Some(list_obj) = list_value.as_object() {
-            let nested_type_name = get_complex_type_name_internal(cache, &list_obj);
-            return format!("List<{}>", nested_type_name);
+            let nested_type_name = get_complex_type_name_internal(cache, &list_obj, include_generics);
+            return format!("List~{}~", nested_type_name);
         } else {
-            return format!("List<{}>", list_value.as_str().unwrap());
+            return format!("List~{}~", list_value.as_str().unwrap());
         }
     }
     if let Some(enum_value) = complex_type.get("Enum"){
-        let interface_obj = enum_value.as_object().unwrap();
-        let name = interface_obj.get("base_name").unwrap().as_str().unwrap();
+        let name = if let Some(enum_obj) = enum_value.as_object() { 
+            let enum_id  = enum_obj.get("id").unwrap().to_string();
+            let enum_ = cache.as_object().unwrap().get(&enum_id).unwrap().as_object().unwrap();
+            enum_.get("base_name").unwrap().to_string().replace("\"", "")
+        } else {
+            return String::from("Any");
+        };
         return String::from(name);
     }
     if let Some(struct_value) = complex_type.get("Struct"){
-        let struct_obj = if let Some(struct_obj) = struct_value.as_object() {struct_obj} else {
-            let struct_id = struct_value.as_str().unwrap().to_string();
-            cache.as_object().unwrap().get(&struct_id).unwrap().as_object().unwrap()
+        let mut name = if let Some(struct_obj) = struct_value.as_object() { 
+            let struct_id  = struct_obj.get("id").unwrap().to_string();
+            let struct_ = cache.as_object().unwrap().get(&struct_id).unwrap().as_object().unwrap();
+            struct_.get("base_name").unwrap().to_string().replace("\"", "")
+        } else {
+            return String::from("Any");
         };
-        let name = struct_obj.get("base_name").unwrap().as_str().unwrap();
+
+        if include_generics {
+            let brands = if let Some(struct_obj) = struct_value.as_object() {
+                struct_obj.get("generics").unwrap().as_array().unwrap()
+            } else {
+                &Vec::new()
+            };
+
+            if brands.is_empty() {} else {
+                let mut brands_str_v  = 
+                    brands
+                    .iter()
+                    .map(|x| get_complex_type_name_internal(cache.clone(), x.as_object().unwrap(), include_generics))
+                    .fold(String::from("~"), |x, y| x + y.as_str() + ",");
+                brands_str_v.pop();
+                brands_str_v  += "~";
+                name += brands_str_v.as_str();
+            } 
+        }
+
         return String::from(name);
     }
     if let Some(interface_value) = complex_type.get("Interface"){
-        let interface_obj = interface_value.as_object().unwrap();
-        let name = interface_obj.get("base_name").unwrap().as_str().unwrap();
+        let mut name = if let Some(interface_obj) = interface_value.as_object() { 
+            let interface_id  = interface_obj.get("id").unwrap().to_string();
+            let interface_ = cache.as_object().unwrap().get(&interface_id).unwrap().as_object().unwrap();
+            interface_.get("base_name").unwrap().to_string().replace("\"", "")
+        } else {
+            return String::from("Any");
+        };
+
+        if include_generics {
+            let brands = if let Some(interface_obj) = interface_value.as_object() {
+                interface_obj.get("generics").unwrap().as_array().unwrap()
+            } else {
+                &Vec::new()
+            };
+
+            if brands.is_empty() {} else {
+                let mut brands_str_v  = 
+                    brands
+                    .iter()
+                    .map(|x| get_complex_type_name_internal(cache.clone(), x.as_object().unwrap(), include_generics))
+                    .fold(String::from("~"), |x, y| x + y.as_str() + ",");
+                brands_str_v.pop();
+                brands_str_v  += "~";
+                name += brands_str_v.as_str();
+            } 
+        }
+
         return String::from(name);
     }
     return String::from("");

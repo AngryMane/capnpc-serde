@@ -14,6 +14,7 @@ use crate::serializer::util::*;
 use serde::Serialize;
 use serde_json;
 
+
 pub fn serialize_file(
     cache: &mut cache::NodeCache,
     ctx: &GeneratorContext,
