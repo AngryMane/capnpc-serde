@@ -1,3 +1,5 @@
+use capnp::schema_capnp::code_generator_request::requested_file;
+use capnp::schema_capnp::code_generator_request::requested_file::import;
 use capnp::schema_capnp::node;
 use capnp::serialize;
 use capnpc::codegen::GeneratorContext;
@@ -51,6 +53,13 @@ pub fn serialize(
         return Err(CapSerError::new("failed to load requested files"));
     }
     let requested_file = requested_files.get(0);
+    for requested_file in requested_files {
+        for import in requested_file.get_imports()? {
+            if let Some(import_path) = resolve_import_file_path(import_paths, &import.get_name()?.to_string() ){
+                serialize(cache, no_standard_import, import_paths, src_prefixes, &import_path);
+            }
+        }
+    }
 
     let file = serialize_node(cache, &ctx, requested_file.get_id(), &abs_file_path)?;
     Ok(serde_json::to_value(file)?)
@@ -110,4 +119,24 @@ fn run_capnp(
 
     let mut p = command.spawn().unwrap();
     p.stdout.take().unwrap()
+}
+
+fn resolve_import_file_path(import_paths: &Vec<PathBuf>, import_file_path: &String) -> Option<PathBuf> {
+    let mut import_file_path = import_file_path.clone();
+    if PathBuf::from(&import_file_path).exists() {
+        return Some(PathBuf::from(&import_file_path));
+    }
+
+    if import_file_path.starts_with("/") {
+        import_file_path = import_file_path.split_off(1);
+    }
+
+    for path in import_paths {
+        let new_path = path.join(import_file_path.as_str());
+        if new_path.exists() {
+            return Some(new_path);
+        }
+    }
+
+    None
 }

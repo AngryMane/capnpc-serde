@@ -8,9 +8,8 @@
 {%- if list is containing("List") -%}
 {{ self::extract_payload_type_of_list(list=list["List"]) }}
 {%- else -%}
-{%- for key, value in list -%}
-{{value.base_name}}
-{%- endfor -%}
+{%- set list_element_type = get_complex_type_name(complex_type=list, resolve_generics=false) -%}
+{{ list_element_type }}
 {%- endif -%}
 {%- endif -%}
 {%- endmacro extract_payload_type_of_list -%}
