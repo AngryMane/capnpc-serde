@@ -25,7 +25,7 @@ interface GenericsIF(T) {
     testMessage @0 () -> (result: T);
 }
 
-struct Daty $baz(2) {
+struct Daty(T) $baz(2) {
   enum EnumTest {
     foo @0;
     bar @1;
@@ -34,7 +34,7 @@ struct Daty $baz(2) {
     # ...
   }
   year @0 :EnumTest = foo;
-  month @1 :UInt8;
+  month @1 :T;
   day @2 :UInt8;
   target @3 :List(Bool) = [ true, false, false, true ];
 }  

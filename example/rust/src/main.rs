@@ -53,10 +53,14 @@ pub fn render_file(serialized: serde_json::Value) {
 
     let mut context: Context = Context::new();
     context.insert("file_node", &root);
+    context.insert("id_map", &id_map);
     let arc_cache = Arc::new(id_map.clone());
     let arc_root = Arc::new(root.clone());
     renderer.register_function("render_node", render_node(Arc::clone(&arc_cache), Arc::clone(&arc_root)));
-    let result = renderer.render("file.tmpl", &context).unwrap();
+
+    //let result = renderer.render("file.tmpl", &context).unwrap();
+    let result = renderer.render("all.tmpl", &context).unwrap();
+
     println!("{}", result);
 }
 
@@ -162,6 +166,7 @@ fn get_complex_type_name_internal(cache: Arc<serde_json::Value>, complex_type: &
             name += brands_str_v.as_str();
         } 
 
+        let name = format!("`{}`", name);
         return String::from(name);
     }
     if let Some(interface_type) = complex_type.get("Interface"){

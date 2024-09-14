@@ -23,19 +23,19 @@
             {%- if field.type_ is containing("List") -%}
                 {%- set payload_type = self::extract_payload_type_of_list(list=field.type_) -%}
                 {%- if payload_type | length > 0 -%}
-                    {{parent_name}} --> {{ payload_type }} : Refernce
+                    `{{parent_name}}` --> {{ payload_type }} : Refernce
                 {% endif -%}
             {% else -%}
                 {%- set payload_type = get_complex_type_name(complex_type=field.type_) -%}
                 {%- if payload_type | length > 0 -%}
-                    {{parent_name}} --> {{ payload_type }} : Refernce
+                    `{{parent_name}}` --> {{ payload_type }} : Refernce
                 {% endif -%}
 
                 {%- if field.type_ is containing("Struct") -%}
                     {%- for brand in field.type_.Struct.generics -%}
                         {%- set payload_type = get_complex_type_name(complex_type=brand, resolve_generics=false) -%}
                         {%- if payload_type | length > 0 -%}
-                            {{parent_name}} --> {{ payload_type }} : Refernce
+                            `{{parent_name}}` --> {{ payload_type }} : Refernce
                         {% endif -%}
                     {%- endfor -%}
                 {% endif -%}
@@ -43,7 +43,7 @@
                     {%- for brand in field.type_.Interface.generics -%}
                         {%- set payload_type = get_complex_type_name(complex_type=brand, resolve_generics=false) -%}
                         {%- if payload_type | length > 0 -%}
-                            {{parent_name}} --> {{ payload_type }} : Refernce
+                            `{{parent_name}}` --> {{ payload_type }} : Refernce
                         {% endif -%}
                     {%- endfor -%}
                 {% endif -%}
@@ -51,7 +51,7 @@
         {% endif -%}
     {%- endif -%}
     {%- if field.field_type == "Group" -%}
-        {{parent_name}} *-- {{ get_name_by_id(id=field.type_id) }} : Group
+        `{{parent_name}}` *-- {{ get_name_by_id(id=field.type_id) }} : Group
     {% endif -%}
 {%- endmacro extract_relationship -%}
 
@@ -59,11 +59,11 @@
 {# render_group #}
 {################}
 {%- macro render_group(group, parent_name) -%}
-class {{ group.base_name }} 
+class `{{ group.base_name }} `
 {% if group.is_union -%}
-<<union>> {{ group.base_name }}
+<<union>> `{{ group.base_name }}`
 {%- else -%}
-<<group>> {{ group.base_name }}
+<<group>> `{{ group.base_name }}`
 {%- endif %}
 
 {% for cur in group.fields -%}
@@ -110,8 +110,25 @@ class {{ group.base_name }}
 {# render_struct #}
 {#################}
 {%- macro render_struct(struct) -%}
-class {{ struct.base_name }} 
-<<struct>> {{ struct.base_name }}
+
+{%- set brands = "~" -%}
+{%- for brand in struct.brands -%}
+    {%- if loop.first -%}
+        {%- set_global brands = brands ~ brand -%}
+    {%- else -%}
+        {%- set_global brands = brands ~ "," ~ brand -%}
+    {%- endif -%}
+{%- endfor -%}
+{%- set brands = brands ~ "~" -%}
+
+{%- if struct.brands | length > 0 -%}
+    class `{{ struct.base_name }}` {{ brands }}
+{% else -%}
+    class `{{ struct.base_name }}` 
+{% endif -%}
+<<struct>> `{{ struct.base_name }}`
+
+
 {% for cur in struct.fields -%}
 {{ field_tmpl::render_field(parent_name=struct.base_name, field=cur) }}
 {% endfor -%}

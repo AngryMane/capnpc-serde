@@ -1,0 +1,5 @@
+classDiagram
+
+{% for id, node in id_map -%}
+{{ render_node(id=id) }}
+{%- endfor -%}
