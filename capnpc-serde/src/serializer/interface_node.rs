@@ -1,5 +1,6 @@
 use capnp::schema_capnp::node;
 use capnpc::codegen::GeneratorContext;
+use capnpc::codegen_types::RustNodeInfo;
 use log::{debug, warn};
 use std::fmt;
 use std::path::PathBuf;
@@ -31,7 +32,7 @@ pub fn serialize_interface(
 struct InterfaceNode {
     #[serde(flatten)]
     common_node: CommonNode,
-    brands: Vec<serde_json::Value>,
+    brands: Vec<String>,
     methods: Vec<serde_json::Value>,
 }
 
@@ -51,7 +52,10 @@ impl InterfaceNode {
         };
 
         //TODO:
-        let brands = Vec::new(); 
+        let mut brands = Vec::new(); 
+        for brand in node.parameters_texts(ctx).expanded_list {
+            brands.push(brand);
+        }
 
         let methods: Vec<serde_json::Value> = interface
             .get_methods()?

@@ -1,6 +1,7 @@
 use capnp::schema_capnp::field;
 use capnp::schema_capnp::node;
 use capnpc::codegen::GeneratorContext;
+use capnpc::codegen_types::RustNodeInfo;
 use log::debug;
 use log::warn;
 use std::fmt;
@@ -33,7 +34,7 @@ struct StructNode {
     #[serde(flatten)]
     common_node: CommonNode,
     is_union: bool,
-    brands: Vec<serde_json::Value>,
+    brands: Vec<String>,
     fields: Vec<serde_json::Value>,
     union_fields: Vec<serde_json::Value>,
 }
@@ -53,8 +54,10 @@ impl StructNode {
             return Err(CapSerError::new("This is not struct node."));
         };
 
-        //TODO:
-        let brands = Vec::new(); 
+        let mut brands = Vec::new(); 
+        for brand in node.parameters_texts(ctx).expanded_list {
+            brands.push(brand);
+        }
 
         let fields: Vec<serde_json::Value> = struct_
             .get_fields()?

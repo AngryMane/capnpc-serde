@@ -146,7 +146,9 @@
             "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
             "annotations": [],
             "base_name": "GenericsIF",
-            "brands": [],
+            "brands": [
+                "T"
+            ],
             "id": "12531345149502871228",
             "methods": [
                 {
@@ -156,7 +158,9 @@
                         "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
                         "annotations": [],
                         "base_name": "testMessage$Params",
-                        "brands": [],
+                        "brands": [
+                            "T"
+                        ],
                         "fields": [],
                         "id": "15909421758123975923",
                         "is_union": true,
@@ -172,7 +176,9 @@
                         "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
                         "annotations": [],
                         "base_name": "testMessage$Results",
-                        "brands": [],
+                        "brands": [
+                            "T"
+                        ],
                         "fields": [
                             {
                                 "annotations": [],
@@ -384,7 +390,9 @@
             "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/phone.capnp",
             "annotations": [],
             "base_name": "DymmyA",
-            "brands": [],
+            "brands": [
+                "YEARTYPE"
+            ],
             "fields": [
                 {
                     "annotations": [],
@@ -727,7 +735,9 @@
             "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
             "annotations": [],
             "base_name": "testMessage$Params",
-            "brands": [],
+            "brands": [
+                "T"
+            ],
             "fields": [],
             "id": "15909421758123975923",
             "is_union": true,
@@ -880,7 +890,9 @@
             "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/phone.capnp",
             "annotations": [],
             "base_name": "Date",
-            "brands": [],
+            "brands": [
+                "YEARTYPE"
+            ],
             "fields": [
                 {
                     "annotations": [],
@@ -1096,7 +1108,9 @@
             "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
             "annotations": [],
             "base_name": "testMessage$Results",
-            "brands": [],
+            "brands": [
+                "T"
+            ],
             "fields": [
                 {
                     "annotations": [],

@@ -27,7 +27,7 @@
                     {{parent_name}} --> {{ payload_type }}
                 {% endif -%}
             {% else -%}
-                {%- set payload_type = get_complex_type_name(complex_type=field.type_, include_generics=false) -%}
+                {%- set payload_type = get_complex_type_name(complex_type=field.type_, resolve_generics=false) -%}
                 {%- if payload_type | length > 0 -%}
                     {{parent_name}} --> {{ payload_type }}
                 {% endif -%}
@@ -39,11 +39,32 @@
     {% endif -%}
 {%- endmacro extract_relationship -%}
 
-class {{ interface.base_name }} 
+
+{%- set brands = "~" -%}
+{% for brand in interface.brands -%}
+    {%- if loop.first -%}
+        {%- set_global brands = brands ~ brand -%}
+    {%- else -%}
+        {%- set_global brands = brands ~ "," ~ brand -%}
+    {%- endif -%}
+{%- endfor %}
+{%- set brands = brands ~ "~" -%}
+
+{%- if interface.brands | length > 0 -%}
+    class {{ interface.base_name }} {{ brands }}
+{% else -%}
+    class {{ interface.base_name }} 
+{% endif -%}
+
 <<interface>> {{ interface.base_name }}
+
+
+
+
 {% for cur in interface.methods -%}
     {{ method_tmpl::render_method(method=cur, parent_name=interface.base_name) }}
 {%- endfor %}
+
 {%- set array = [] -%}
 {% for cur_method in interface.methods -%}
     {%- for cur in cur_method.parameters.fields -%} 
