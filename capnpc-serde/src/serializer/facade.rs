@@ -15,6 +15,12 @@ use crate::serializer::interface_node::serialize_interface;
 use crate::serializer::struct_node::serialize_struct;
 use crate::serializer::util::*;
 
+// TODO
+static mut g_no_standard_import: bool = false;
+static mut g_import_paths: Vec<PathBuf> = Vec::new();
+static mut g_src_prefixes: Vec<PathBuf> = Vec::new();
+
+
 pub fn serialize(
     cache: &mut cache::NodeCache,
     no_standard_import: bool,
@@ -22,6 +28,13 @@ pub fn serialize(
     src_prefixes: &Vec<PathBuf>,
     file: &PathBuf,
 ) -> CapSerResult<serde_json::Value> {
+
+    unsafe {
+        g_no_standard_import = no_standard_import;
+        g_import_paths = import_paths.clone();
+        g_src_prefixes = src_prefixes.clone();
+    }
+
     debug!("{}:{} serialize called", file!(), line!());
     let abs_file_path = fs::canonicalize(file)?;
     let stdout = run_capnp(no_standard_import, import_paths, src_prefixes, file);
@@ -55,16 +68,18 @@ pub fn serialize_node(
 
     debug!("{}:{} serialize_node called", file!(), line!());
     let node = ctx.node_map[&node_id];
-    let result = match node.which()? {
-        node::File(_) => serialize_file(cache, ctx, node.get_id(), abs_file_path),
-        node::Struct(_) => serialize_struct(cache, ctx, node.get_id(), abs_file_path),
-        node::Interface(_) => serialize_interface(cache, ctx, node.get_id(), abs_file_path),
-        node::Const(_) => serialize_const(cache, ctx, node.get_id(), abs_file_path),
-        node::Enum(_) => serialize_enum(cache, ctx, node.get_id(), abs_file_path),
-        node::Annotation(_) => serialize_annotation_decl(cache, ctx, node.get_id(), abs_file_path),
-    }?;
-    cache.register_node(&result);
-    Ok(result)
+    unsafe {
+        let result = match node.which()? {
+            node::File(_) => serialize_file(g_no_standard_import, &g_import_paths, &g_src_prefixes, cache, ctx, node.get_id(), abs_file_path),
+            node::Struct(_) => serialize_struct(cache, ctx, node.get_id(), abs_file_path),
+            node::Interface(_) => serialize_interface(cache, ctx, node.get_id(), abs_file_path),
+            node::Const(_) => serialize_const(cache, ctx, node.get_id(), abs_file_path),
+            node::Enum(_) => serialize_enum(cache, ctx, node.get_id(), abs_file_path),
+            node::Annotation(_) => serialize_annotation_decl(cache, ctx, node.get_id(), abs_file_path),
+        }?;
+        cache.register_node(&result);
+        Ok(result)
+    }
 }
 
 fn run_capnp(

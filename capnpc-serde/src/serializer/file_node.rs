@@ -16,6 +16,9 @@ use serde_json;
 
 
 pub fn serialize_file(
+    no_standard_impot: bool,
+    import_paths: &Vec<PathBuf>,
+    src_prefixes: &Vec<PathBuf>,
     cache: &mut cache::NodeCache,
     ctx: &GeneratorContext,
     id: u64,
@@ -25,7 +28,7 @@ pub fn serialize_file(
     if !cache.start_parse_node(ctx, id)? {
         return Ok(serde_json::to_value(id.to_string())?);
     }
-    let ret = FileNode::new(cache, ctx, id, abs_file_path)?;
+    let ret = FileNode::new(no_standard_impot, import_paths, src_prefixes, cache, ctx, id, abs_file_path)?;
     cache.end_parse_node();
     Ok(serde_json::to_value(ret)?)
 }
@@ -39,6 +42,9 @@ struct FileNode {
 
 impl FileNode {
     fn new(
+        no_standard_impot: bool,
+        import_paths: &Vec<PathBuf>,
+        src_prefixes: &Vec<PathBuf>,
         cache: &mut cache::NodeCache,
         ctx: &GeneratorContext,
         id: u64,
@@ -54,7 +60,7 @@ impl FileNode {
         let imported_file: Vec<serde_json::Value> = target_file
             .get_imports()?
             .into_iter()
-            .filter_map(|x| FileNode::load_imported_file(cache, &x, abs_file_path).ok())
+            .filter_map(|x| FileNode::load_imported_file(no_standard_impot, import_paths, src_prefixes,cache, &x, abs_file_path).ok())
             .collect();
         Ok(FileNode {
             common_node,
@@ -63,6 +69,9 @@ impl FileNode {
     }
 
     fn load_imported_file(
+        no_standard_impot: bool,
+        import_paths: &Vec<PathBuf>,
+        src_prefixes: &Vec<PathBuf>,
         cache: &mut cache::NodeCache,
         imported: &code_generator_request::requested_file::import::Reader,
         abs_file_path: &Path,
@@ -70,13 +79,11 @@ impl FileNode {
         let relative_imported_file_path = String::from(imported.get_name()?);
         let abs_imported_file_path =
             FileNode::get_abs_imported_file_path(&relative_imported_file_path, abs_file_path)?;
-        let import_paths: Vec<PathBuf> = vec![];
-        let src_prefixes: Vec<PathBuf> = vec![];
         let serialized = serialize(
             cache,
-            false,
-            &import_paths,
-            &src_prefixes,
+            no_standard_impot,
+            import_paths,
+            src_prefixes,
             &abs_imported_file_path,
         )?;
         Ok(serialized)
