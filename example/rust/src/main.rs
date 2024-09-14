@@ -1,5 +1,4 @@
 use capnpc_serde::*;
-use std::iter;
 use std::path::PathBuf;
 use std::env;
 use serde_json;
@@ -71,10 +70,6 @@ fn render_node(cache: Arc<serde_json::Value>, root_value: Arc<serde_json::Value>
             "Enum" => renderer.render("enum.tmpl", &context).unwrap(),
             _ => String::from(""),
         };
-
-        if node_type == "Interface" {
-            println!("{}", node.get("brands").unwrap());
-        }
 
         return Ok(tera::to_value(ret).unwrap());
     })
