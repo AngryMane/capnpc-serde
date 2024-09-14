@@ -7,6 +7,9 @@ annotation baz(*) :Int32;
 
 $note("annotation to file");
 
+interface Example extends(Sample) {
+    finalize @0 (debug: Bool) -> (result: GenericsIF(Daty));
+}
 
 interface Sample {
     initialize @0 (debug: Bool) -> (result: GenericsIF(Daty));

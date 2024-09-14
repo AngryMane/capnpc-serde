@@ -1,5 +1,5 @@
 classDiagram
 
-{%- for cur in file_node.nested_nodes %}
+{% for cur in file_node.nested_nodes -%}
 {{ render_node(id=cur) }}
 {%- endfor -%}

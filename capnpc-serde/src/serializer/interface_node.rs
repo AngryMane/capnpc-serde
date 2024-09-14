@@ -51,10 +51,13 @@ impl InterfaceNode {
             return Err(CapSerError::new("This is not interface node."));
         };
 
-        //TODO:
         let mut brands = Vec::new(); 
         for brand in node.parameters_texts(ctx).expanded_list {
             brands.push(brand);
+        }
+
+        //TODO:
+        for _ in interface.get_superclasses()?{
         }
 
         let methods: Vec<serde_json::Value> = interface
