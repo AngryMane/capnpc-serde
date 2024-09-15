@@ -43,7 +43,7 @@ fn main() {
 }
 
 pub fn render_file(serialized: serde_json::Value) {
-    let mut renderer: Option<Tera> = match Tera::new("/usr/local/bin/capnp-mmd/templates/**") {
+    let mut renderer: Option<Tera> = match Tera::new("/usr/local/bin/templates/**") {
         Ok(t) => Some(t),
         Err(_) => None,
     };
@@ -79,7 +79,7 @@ pub fn render_file(serialized: serde_json::Value) {
 
 fn render_relationship(cache: Arc<serde_json::Value>, root_value: Arc<serde_json::Value>) -> impl tera::Function{
     Box::new(move |args: &HashMap<String, Value>| -> tera::Result<Value> {
-        let mut renderer: Option<Tera> = match Tera::new("/usr/local/bin/capnp-mmd/templates/**") {
+        let mut renderer: Option<Tera> = match Tera::new("/usr/local/bin/templates/**") {
             Ok(t) => Some(t),
             Err(_) => None,
         };
@@ -110,7 +110,7 @@ fn render_relationship(cache: Arc<serde_json::Value>, root_value: Arc<serde_json
 
 fn render_node(cache: Arc<serde_json::Value>, root_value: Arc<serde_json::Value>) -> impl tera::Function{
     Box::new(move |args: &HashMap<String, Value>| -> tera::Result<Value> {
-        let mut renderer: Option<Tera> = match Tera::new("/usr/local/bin/capnp-mmd/templates/**") {
+        let mut renderer: Option<Tera> = match Tera::new("/usr/local/bin/templates/**") {
             Ok(t) => Some(t),
             Err(_) => None,
         };

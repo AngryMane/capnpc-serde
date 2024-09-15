@@ -20,6 +20,6 @@ priority = "optional"
 maintainer-scripts = "debian/"
 systemd-units = { enable = false }
 assets = [
-    ["target/release/capnp-mmd", "usr/local/bin/capnp-mmd/", "755"],
-    ["templates/*", "usr/local/bin/capnp-mmd/templates", "755"]
+    ["target/release/capnp-mmd", "/usr/local/bin/", "755"],
+    ["templates/*", "/usr/local/bin/templates/", "755"]
 ]
