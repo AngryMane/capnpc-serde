@@ -173,7 +173,10 @@ fn get_complex_type_name_internal(cache: Arc<serde_json::Value>, complex_type: &
                 .as_array()
                 .unwrap()
                 .iter()
-                .map(|x| get_complex_type_name_internal(cache.clone(), x.as_object().unwrap(), resolve_generics))
+                .map(
+                    |x| 
+                    if x.is_object() { get_complex_type_name_internal(cache.clone(), x.as_object().unwrap(), resolve_generics) } else { x.to_string() }
+                )
                 .collect::<Vec<String>>()
         } else {
             struct_node.get("brands").unwrap().as_array().unwrap().iter().map(|x| x.to_string().replace("\"", "")).collect::<Vec<String>>()
@@ -208,7 +211,10 @@ fn get_complex_type_name_internal(cache: Arc<serde_json::Value>, complex_type: &
                 .as_array()
                 .unwrap()
                 .iter()
-                .map(|x| get_complex_type_name_internal(cache.clone(), x.as_object().unwrap(), resolve_generics))
+                .map(
+                    |x| 
+                    if x.is_object() { get_complex_type_name_internal(cache.clone(), x.as_object().unwrap(), resolve_generics) } else { x.to_string() }
+                )
                 .collect::<Vec<String>>()
         } else {
             interface_node.get("brands").unwrap().as_array().unwrap().iter().map(|x| x.to_string().replace("\"", "")).collect::<Vec<String>>()
@@ -270,6 +276,10 @@ fn get_field_related_ids(cache: Arc<serde_json::Value>, field: &Value) -> Vec<St
 }
 
 fn get_type_related_ids(cache: Arc<serde_json::Value>, type_: &Value) -> Vec<String> {
+    if ! type_.is_object() {
+        return vec![];
+    }
+
     let type_ = type_.as_object().unwrap();
     if let Some(a) = type_.get("List"){
         return if a.is_object()  {
