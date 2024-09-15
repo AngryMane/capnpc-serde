@@ -29,5 +29,8 @@
     {% endfor -%}
 {% endmacro render_struct -%}
 
-{{ self::render_struct(struct=struct) }}
+{%- if struct.base_name is containing("$") -%}
+{%- else -%}
+    {{ self::render_struct(struct=struct) }}
+{%- endif -%}
 

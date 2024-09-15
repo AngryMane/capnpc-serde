@@ -1,3 +1,7 @@
 {%- for id in ids %}
-`{{ node.base_name }}` --> {{ get_name_by_id(id=id) }} : Reference
+    {%- set name = get_name_by_id(id=id) -%}
+    {%- if name is containing("$") or node.base_name is containing("$") -%}
+    {%- else %}
+`{{ node.base_name }}` --> {{ name }} : Reference
+    {%- endif -%}
 {%- endfor -%}
