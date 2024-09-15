@@ -43,10 +43,21 @@ fn main() {
 }
 
 pub fn render_file(serialized: serde_json::Value) {
-    let mut renderer: Tera = match Tera::new("./templates/**") {
-        Ok(t) => t,
-        Err(e) => {println!{"{}", e};return;},
+    let mut renderer: Option<Tera> = match Tera::new("/usr/local/bin/capnp-mmd/templates/**") {
+        Ok(t) => Some(t),
+        Err(_) => None,
     };
+    if renderer.is_none() {
+        renderer = match Tera::new("./templates/**") {
+            Ok(t) => Some(t),
+            Err(_) => None,
+        };
+    }
+    if renderer.is_none() {
+        println!("templates not found.");
+        return;
+    }
+    let mut renderer = renderer.unwrap();
 
     let root_id = serialized.as_object().unwrap().get("root_id").unwrap().as_str().unwrap();
     let id_map = serialized.as_object().unwrap().get("id_map").unwrap(); 
@@ -68,7 +79,18 @@ pub fn render_file(serialized: serde_json::Value) {
 
 fn render_relationship(cache: Arc<serde_json::Value>, root_value: Arc<serde_json::Value>) -> impl tera::Function{
     Box::new(move |args: &HashMap<String, Value>| -> tera::Result<Value> {
-        let mut renderer: Tera = Tera::new("./templates/**").unwrap();
+        let mut renderer: Option<Tera> = match Tera::new("/usr/local/bin/capnp-mmd/templates/**") {
+            Ok(t) => Some(t),
+            Err(_) => None,
+        };
+        if renderer.is_none() {
+            renderer = match Tera::new("./templates/**") {
+                Ok(t) => Some(t),
+                Err(_) => None,
+            };
+        }
+        let mut renderer = renderer.unwrap();
+
         let mut context: Context = Context::new();
         renderer.register_function("get_name_by_id", get_name_by_id(Arc::clone(&cache), Arc::clone(&root_value)));
         renderer.register_function("get_complex_type_name", get_complex_type_name(Arc::clone(&cache)));
@@ -88,7 +110,17 @@ fn render_relationship(cache: Arc<serde_json::Value>, root_value: Arc<serde_json
 
 fn render_node(cache: Arc<serde_json::Value>, root_value: Arc<serde_json::Value>) -> impl tera::Function{
     Box::new(move |args: &HashMap<String, Value>| -> tera::Result<Value> {
-        let mut renderer: Tera = Tera::new("./templates/**").unwrap();
+        let mut renderer: Option<Tera> = match Tera::new("/usr/local/bin/capnp-mmd/templates/**") {
+            Ok(t) => Some(t),
+            Err(_) => None,
+        };
+        if renderer.is_none() {
+            renderer = match Tera::new("./templates/**") {
+                Ok(t) => Some(t),
+                Err(_) => None,
+            };
+        }
+        let mut renderer = renderer.unwrap();
         let mut context: Context = Context::new();
         renderer.register_function("render_node", render_node(Arc::clone(&cache), Arc::clone(&root_value)));
         renderer.register_function("get_name_by_id", get_name_by_id(Arc::clone(&cache), Arc::clone(&root_value)));
