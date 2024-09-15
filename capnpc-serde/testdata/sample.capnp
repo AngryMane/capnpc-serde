@@ -33,6 +33,16 @@ struct Daty(T) $baz(2) {
     qux @3;
     # ...
   }
+
+  address :group {
+    # Note:  This is a terrible way to use groups, and meant
+    #        only to demonstrate the syntax.
+    houseNumber @4 :UInt32;
+    street @5 :Text;
+    city @6 :Text;
+    country @7 :Text;
+  }
+
   year @0 :EnumTest = foo;
   month @1 :T;
   day @2 :UInt8;

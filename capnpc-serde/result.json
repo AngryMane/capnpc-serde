@@ -52,7 +52,9 @@
                 }
             ],
             "base_name": "Daty",
-            "brands": [],
+            "brands": [
+                "T"
+            ],
             "fields": [
                 {
                     "annotations": [],
@@ -72,14 +74,17 @@
                 },
                 {
                     "annotations": [],
-                    "default_value": {
-                        "Uint8": 0
-                    },
+                    "default_value": {},
                     "field_type": "Slot",
                     "has_default": true,
                     "is_interface": false,
                     "name": "month",
-                    "type_": "Uint8"
+                    "type_": {
+                        "AnyPointer": {
+                            "brand_index": 0,
+                            "branded_node_id": 10906726834602204116
+                        }
+                    }
                 },
                 {
                     "annotations": [],
@@ -102,6 +107,72 @@
                     "type_": {
                         "List": "Bool"
                     }
+                },
+                {
+                    "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+                    "annotations": [],
+                    "base_name": "address",
+                    "brands": [
+                        "T"
+                    ],
+                    "field_type": "Group",
+                    "fields": [
+                        {
+                            "annotations": [],
+                            "default_value": {
+                                "Uint32": 0
+                            },
+                            "field_type": "Slot",
+                            "has_default": true,
+                            "is_interface": false,
+                            "name": "houseNumber",
+                            "type_": "Uint32"
+                        },
+                        {
+                            "annotations": [],
+                            "default_value": {
+                                "Text": ""
+                            },
+                            "field_type": "Slot",
+                            "has_default": true,
+                            "is_interface": false,
+                            "name": "street",
+                            "type_": "Text"
+                        },
+                        {
+                            "annotations": [],
+                            "default_value": {
+                                "Text": ""
+                            },
+                            "field_type": "Slot",
+                            "has_default": true,
+                            "is_interface": false,
+                            "name": "city",
+                            "type_": "Text"
+                        },
+                        {
+                            "annotations": [],
+                            "default_value": {
+                                "Text": ""
+                            },
+                            "field_type": "Slot",
+                            "has_default": true,
+                            "is_interface": false,
+                            "name": "country",
+                            "type_": "Text"
+                        }
+                    ],
+                    "id": "16355055387500401849",
+                    "is_union": false,
+                    "name": "address",
+                    "nested_nodes": [],
+                    "node_type": "Struct",
+                    "parent_id": "10906726834602204116",
+                    "paths": [
+                        "Daty"
+                    ],
+                    "type_id": "16355055387500401849",
+                    "union_fields": []
                 }
             ],
             "id": "10906726834602204116",
@@ -122,14 +193,24 @@
             "fields": [
                 {
                     "annotations": [],
-                    "default_value": {
-                        "Bool": false
-                    },
+                    "default_value": {},
                     "field_type": "Slot",
                     "has_default": true,
                     "is_interface": false,
                     "name": "debug",
-                    "type_": "Bool"
+                    "type_": {
+                        "Struct": {
+                            "generics": [
+                                {
+                                    "Struct": {
+                                        "generics": [],
+                                        "id": 10906726834602204116
+                                    }
+                                }
+                            ],
+                            "id": 17233523631960263827
+                        }
+                    }
                 }
             ],
             "id": "11709880799442689485",
@@ -733,14 +814,24 @@
                         "fields": [
                             {
                                 "annotations": [],
-                                "default_value": {
-                                    "Bool": false
-                                },
+                                "default_value": {},
                                 "field_type": "Slot",
                                 "has_default": true,
                                 "is_interface": false,
                                 "name": "debug",
-                                "type_": "Bool"
+                                "type_": {
+                                    "Struct": {
+                                        "generics": [
+                                            {
+                                                "Struct": {
+                                                    "generics": [],
+                                                    "id": 10906726834602204116
+                                                }
+                                            }
+                                        ],
+                                        "id": 17233523631960263827
+                                    }
+                                }
                             }
                         ],
                         "id": "11709880799442689485",
@@ -936,6 +1027,69 @@
                 "Person",
                 "PhoneNumber"
             ]
+        },
+        "16355055387500401849": {
+            "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/sample.capnp",
+            "annotations": [],
+            "base_name": "address",
+            "brands": [
+                "T"
+            ],
+            "fields": [
+                {
+                    "annotations": [],
+                    "default_value": {
+                        "Uint32": 0
+                    },
+                    "field_type": "Slot",
+                    "has_default": true,
+                    "is_interface": false,
+                    "name": "houseNumber",
+                    "type_": "Uint32"
+                },
+                {
+                    "annotations": [],
+                    "default_value": {
+                        "Text": ""
+                    },
+                    "field_type": "Slot",
+                    "has_default": true,
+                    "is_interface": false,
+                    "name": "street",
+                    "type_": "Text"
+                },
+                {
+                    "annotations": [],
+                    "default_value": {
+                        "Text": ""
+                    },
+                    "field_type": "Slot",
+                    "has_default": true,
+                    "is_interface": false,
+                    "name": "city",
+                    "type_": "Text"
+                },
+                {
+                    "annotations": [],
+                    "default_value": {
+                        "Text": ""
+                    },
+                    "field_type": "Slot",
+                    "has_default": true,
+                    "is_interface": false,
+                    "name": "country",
+                    "type_": "Text"
+                }
+            ],
+            "id": "16355055387500401849",
+            "is_union": false,
+            "nested_nodes": [],
+            "node_type": "Struct",
+            "parent_id": "10906726834602204116",
+            "paths": [
+                "Daty"
+            ],
+            "union_fields": []
         },
         "17087438454669982131": {
             "abs_file_path": "/home/yosuke/work/git/capnpc-serde/capnpc-serde/testdata/phone.capnp",

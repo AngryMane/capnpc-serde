@@ -75,29 +75,6 @@
 
 <<interface>> `{{ interface.base_name }}`
 
-
-
-
 {% for cur in interface.methods -%}
     {{ method_tmpl::render_method(method=cur, parent_name=interface.base_name) }}
 {%- endfor %}
-
-{%- set array = [] -%}
-{% for cur_method in interface.methods -%}
-    {%- for cur in cur_method.parameters.fields -%} 
-        {%- set a = self::extract_relationship(parent_name=interface.base_name, field=cur) -%}
-        {%- set_global array = array | concat(with=a) -%}
-    {%- endfor -%}
-    {%- for cur in cur_method.results.fields -%} 
-        {%- set a = self::extract_relationship(parent_name=interface.base_name, field=cur) -%}
-        {%- set_global array = array | concat(with=a) -%}
-    {%- endfor -%}
-{%- endfor %}
-{%- for cur in  array | unique -%}
-    {%- if cur | length > 0 -%}
-        {{ cur }}
-    {%- endif -%}
-{%- endfor -%}
-{%- for cur in interface.nested_nodes %}
-    {{ render_node(id=cur) }}
-{%- endfor -%}

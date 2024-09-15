@@ -6,6 +6,7 @@ use clap::Parser;
 use tera::Tera;
 use tera::Context;
 use std::collections::HashMap;
+use std::collections::HashSet;
 use tera::Value;
 use std::sync::Arc;
 
@@ -57,11 +58,32 @@ pub fn render_file(serialized: serde_json::Value) {
     let arc_cache = Arc::new(id_map.clone());
     let arc_root = Arc::new(root.clone());
     renderer.register_function("render_node", render_node(Arc::clone(&arc_cache), Arc::clone(&arc_root)));
+    renderer.register_function("render_relationship", render_relationship(Arc::clone(&arc_cache), Arc::clone(&arc_root)));
 
     //let result = renderer.render("file.tmpl", &context).unwrap();
     let result = renderer.render("all.tmpl", &context).unwrap();
 
     println!("{}", result);
+}
+
+fn render_relationship(cache: Arc<serde_json::Value>, root_value: Arc<serde_json::Value>) -> impl tera::Function{
+    Box::new(move |args: &HashMap<String, Value>| -> tera::Result<Value> {
+        let mut renderer: Tera = Tera::new("./templates/**").unwrap();
+        let mut context: Context = Context::new();
+        renderer.register_function("get_name_by_id", get_name_by_id(Arc::clone(&cache), Arc::clone(&root_value)));
+        renderer.register_function("get_complex_type_name", get_complex_type_name(Arc::clone(&cache)));
+
+        let id = &args["id"].as_str().unwrap().to_string();
+        let arc_cache = Arc::clone(&cache);
+        let node = if let Some(node_) = arc_cache.as_object().unwrap().get(id) {node_.as_object().unwrap()} else { return Ok(tera::to_value("").unwrap());};
+        let ids = get_object_related_ids_internal(cache.clone(), node);
+        let uniq_ids: HashSet<String> = ids.into_iter().collect();
+
+        context.insert("node", &node);
+        context.insert("ids", &uniq_ids);
+        let ret = renderer.render("relationship.tmpl", &context).unwrap();
+        return Ok(tera::to_value(ret).unwrap());
+    })
 }
 
 fn render_node(cache: Arc<serde_json::Value>, root_value: Arc<serde_json::Value>) -> impl tera::Function{
@@ -204,4 +226,69 @@ fn get_complex_type_name_internal(cache: Arc<serde_json::Value>, complex_type: &
         return String::from(name);
     }
     return String::from("");
+}
+
+fn get_object_related_ids_internal(cache: Arc<serde_json::Value>, node: &serde_json::Map<String, Value>) -> Vec<String> {
+    let mut ids = Vec::<String>::new();
+    match node.get("node_type").unwrap().as_str().unwrap() {
+        "Struct" => {
+            for field in node.get("fields").unwrap().as_array().unwrap() {
+                ids.append(&mut get_field_related_ids(cache.clone(), field));
+            }
+        }
+        "Interface" => {
+            for method in node.get("methods").unwrap().as_array().unwrap() {
+                let parameters = method.get("parameters").unwrap().as_object().unwrap();
+                for field in parameters.get("fields").unwrap().as_array().unwrap() {
+                    ids.append(&mut get_field_related_ids(cache.clone(), field))
+                }
+
+                let results = method.get("results").unwrap().as_object().unwrap();
+                for field in results.get("fields").unwrap().as_array().unwrap() {
+                    ids.append(&mut get_field_related_ids(cache.clone(), field))
+                }
+            }
+        }
+        _=>{}
+    }
+    ids
+}
+
+fn get_field_related_ids(cache: Arc<serde_json::Value>, field: &Value) -> Vec<String> {
+    let field = field.as_object().unwrap();
+    if field.get("field_type").unwrap() == "Group" {
+        return vec![field.get("id").unwrap().to_string()];
+    }
+
+    if !field.get("type_").unwrap().is_object() {
+        return vec![]
+    }
+    get_type_related_ids(cache, field.get("type_").unwrap())
+}
+
+fn get_type_related_ids(cache: Arc<serde_json::Value>, type_: &Value) -> Vec<String> {
+    let type_ = type_.as_object().unwrap();
+    if let Some(a) = type_.get("List"){
+        return if a.is_object()  {
+            get_type_related_ids(cache.clone(), a)
+        } else {
+            vec![]
+        }
+    }
+
+    if let Some(_) = type_.get("AnyPointer"){
+        return vec![];
+    }
+
+    let mut result = Vec::<String>::new();
+    for value in type_.values(){
+        for brand in value.get("generics").unwrap().as_array().unwrap() {
+            result.append(&mut get_type_related_ids(cache.clone(), brand));
+        }
+        let id = value.get("id").unwrap().to_string();
+        result.push(id);
+        break;
+    }
+
+    result 
 }

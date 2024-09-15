@@ -1,174 +1,33 @@
 {%- import "field.tmpl" as field_tmpl -%}
 
-{################################}
-{# extract_payload_type_of_list #}
-{################################}
-{%- macro extract_payload_type_of_list(list) -%}
-{%- if list is object -%}
-{%- if list is containing("List") -%}
-{{ self::extract_payload_type_of_list(list=list["List"]) }}
-{%- else -%}
-{%- set list_element_type = get_complex_type_name(complex_type=list, resolve_generics=false) -%}
-{{ list_element_type }}
-{%- endif -%}
-{%- endif -%}
-{%- endmacro extract_payload_type_of_list -%}
-
-{########################}
-{# extract_relationship #}
-{########################}
-{%- macro extract_relationship(parent_name, field) -%}
-    {%- if field.field_type == "Slot" -%}
-        {%- if field.type_ is object -%}
-            {%- if field.type_ is containing("List") -%}
-                {%- set payload_type = self::extract_payload_type_of_list(list=field.type_) -%}
-                {%- if payload_type | length > 0 -%}
-                    `{{parent_name}}` --> {{ payload_type }} : Refernce
-                {% endif -%}
-            {% else -%}
-                {%- set payload_type = get_complex_type_name(complex_type=field.type_, resolve_generics=false) -%}
-                {%- if payload_type | length > 0 -%}
-                    `{{parent_name}}` --> {{ payload_type }} : Refernce
-                {% endif -%}
-
-                {%- if field.type_ is containing("Struct") -%}
-                    {%- for brand in field.type_.Struct.generics -%}
-                        {%- set payload_type = get_complex_type_name(complex_type=brand, resolve_generics=false) -%}
-                        {%- if payload_type | length > 0 -%}
-                            `{{parent_name}}` --> {{ payload_type }} : Refernce
-                        {% endif -%}
-                    {%- endfor -%}
-                {% endif -%}
-                {%- if field.type_ is containing("Interface") -%}
-                    {%- for brand in field.type_.Interface.generics -%}
-                        {%- set payload_type = get_complex_type_name(complex_type=brand, resolve_generics=false) -%}
-                        {%- if payload_type | length > 0 -%}
-                            `{{parent_name}}` --> {{ payload_type }} : Refernce
-                        {% endif -%}
-                    {%- endfor -%}
-                {% endif -%}
-            {% endif -%}
-        {% endif -%}
-    {%- endif -%}
-    {%- if field.field_type == "Group" -%}
-        `{{parent_name}}` *-- {{ get_name_by_id(id=field.type_id) }} : Group
-    {% endif -%}
-{%- endmacro extract_relationship -%}
-
-{################}
-{# render_group #}
-{################}
-{%- macro render_group(group, parent_name) -%}
-class `{{ group.base_name }} `
-{% if group.is_union -%}
-<<union>> `{{ group.base_name }}`
-{%- else -%}
-<<group>> `{{ group.base_name }}`
-{%- endif %}
-
-{% for cur in group.fields -%}
-{{ field_tmpl::render_field(parent_name=group.base_name, field=cur) }}
-{% endfor %}
-{% for cur in group.fields -%}
-{%- if cur.field_type == "Group" -%}
-{{ self::render_group(group=cur, parent_name=group.base_name) }}
-{%- endif -%}
-{%- endfor -%}
-{%- set array = [] -%}
-{%- for cur in group.fields -%}
-{%- set a = self::extract_relationship(parent_name=group.base_name, field=cur) -%}
-{%- set_global array = array | concat(with=a) -%}
-{%- endfor -%}
-{%- for cur in  array | unique -%}
-{%- if cur | length > 0 -%}
-{{ cur }}
-{%- endif -%}
-{%- endfor -%}
-
-{% for cur in group.union_fields -%}
-{{ field_tmpl::render_field(parent_name=group.base_name, field=cur) }}
-{% endfor %}
-{% for cur in group.union_fields -%}
-{%- if cur.field_type == "Group" -%}
-{{ self::render_group(group=cur, parent_name=group.base_name) }}
-{%- endif -%}
-{%- endfor -%}
-{%- set array = [] -%}
-{%- for cur in group.union_fields -%}
-{%- set a = self::extract_relationship(parent_name=group.base_name, field=cur) -%}
-{%- set_global array = array | concat(with=a) -%}
-{%- endfor -%}
-{%- for cur in  array | unique -%}
-{%- if cur | length > 0 -%}
-{{ cur }}
-{%- endif -%}
-{%- endfor -%}
-
-{% endmacro render_group -%}
-
 {#################}
 {# render_struct #}
 {#################}
 {%- macro render_struct(struct) -%}
+    {%- set brands = "~" -%}
+    {%- for brand in struct.brands -%}
+        {%- if loop.first -%}
+            {%- set_global brands = brands ~ brand -%}
+        {%- else -%}
+            {%- set_global brands = brands ~ "," ~ brand -%}
+        {%- endif -%}
+    {%- endfor -%}
+    {%- set brands = brands ~ "~" -%}
 
-{%- set brands = "~" -%}
-{%- for brand in struct.brands -%}
-    {%- if loop.first -%}
-        {%- set_global brands = brands ~ brand -%}
-    {%- else -%}
-        {%- set_global brands = brands ~ "," ~ brand -%}
-    {%- endif -%}
-{%- endfor -%}
-{%- set brands = brands ~ "~" -%}
+    {%- if struct.brands | length > 0 -%}
+        class `{{ struct.base_name }}` {{ brands }}
+    {% else -%}
+        class `{{ struct.base_name }}` 
+    {% endif -%}
+    <<struct>> `{{ struct.base_name }}`
 
-{%- if struct.brands | length > 0 -%}
-    class `{{ struct.base_name }}` {{ brands }}
-{% else -%}
-    class `{{ struct.base_name }}` 
-{% endif -%}
-<<struct>> `{{ struct.base_name }}`
-
-
-{% for cur in struct.fields -%}
-{{ field_tmpl::render_field(parent_name=struct.base_name, field=cur) }}
-{% endfor -%}
-{% for cur in struct.fields -%}
-{%- if cur.field_type == "Group" -%}
-{{ self::render_group(group=cur, parent_name=struct.base_name) }}
-{%- endif -%}
-{%- endfor -%}
-{%- set array = [] -%}
-{%- for cur in struct.fields -%}
-{%- set a = self::extract_relationship(parent_name=struct.base_name, field=cur) -%}
-{%- set_global array = array | concat(with=a) -%}
-{%- endfor -%}
-{%- for cur in  array | unique -%}
-{%- if cur | length > 0 -%}
-{{ cur }}
-{%- endif -%}
-{%- endfor -%}
-{% for cur in struct.union_fields -%}
-{{ field_tmpl::render_field(parent_name=struct.base_name, field=cur) }}
-{% endfor -%}
-{% for cur in struct.union_fields -%}
-{%- if cur.field_type == "Group" -%}
-{{ self::render_group(group=cur, parent_name=struct.base_name) }}
-{%- endif -%}
-{%- endfor -%}
-{%- set array = [] -%}
-{%- for cur in struct.union_fields -%}
-{%- set a = self::extract_relationship(parent_name=struct.base_name, field=cur) -%}
-{%- set_global array = array | concat(with=a) -%}
-{%- endfor -%}
-{%- for cur in  array | unique -%}
-{%- if cur | length > 0 -%}
-{{ cur }}
-{%- endif -%}
-{%- endfor -%}
+    {% for cur in struct.fields -%}
+        {{ field_tmpl::render_field(parent_name=struct.base_name, field=cur) }}
+    {% endfor -%}
+    {% for cur in struct.union_fields -%}
+        {{ field_tmpl::render_field(parent_name=struct.base_name, field=cur) }}
+    {% endfor -%}
 {% endmacro render_struct -%}
 
 {{ self::render_struct(struct=struct) }}
-{%- for cur in struct.nested_nodes -%}
-{{ render_node(id=cur) }}
-{%- endfor -%}
 
