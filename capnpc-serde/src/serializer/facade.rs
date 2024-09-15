@@ -1,5 +1,3 @@
-use capnp::schema_capnp::code_generator_request::requested_file;
-use capnp::schema_capnp::code_generator_request::requested_file::import;
 use capnp::schema_capnp::node;
 use capnp::serialize;
 use capnpc::codegen::GeneratorContext;
@@ -21,7 +19,6 @@ use crate::serializer::util::*;
 static mut g_no_standard_import: bool = false;
 static mut g_import_paths: Vec<PathBuf> = Vec::new();
 static mut g_src_prefixes: Vec<PathBuf> = Vec::new();
-
 
 pub fn serialize(
     cache: &mut cache::NodeCache,

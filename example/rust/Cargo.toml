@@ -1,5 +1,5 @@
 [package]
-name = "example"
+name = "capnp-mmd"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,3 +10,16 @@ capnpc-serde = {path="../../capnpc-serde"}
 serde_json = "1.0.99"
 tera = "1.19.0"
 clap = { version = "4.3.11", features = ["derive"] }
+
+[package.metadata.deb]
+maintainer = "AngryMane"
+copyright = "2024, AngryMane"
+depends = "$auto"
+section = "utility"
+priority = "optional"
+maintainer-scripts = "debian/"
+systemd-units = { enable = false }
+assets = [
+    ["target/release/capnp-mmd", "usr/local/bin/", "755"],
+    ["templates/*", "usr/local/bin/templates", "755"]
+]

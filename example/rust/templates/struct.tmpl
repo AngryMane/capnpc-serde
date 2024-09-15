@@ -17,19 +17,19 @@
 
     {%- set namespace = struct.abs_file_path | split(pat="/") | last | replace(from=".", to="_") -%}
     namespace {{ namespace }} {
-    {%- if struct.brands | length > 0 -%}
+    {% if struct.brands | length > 0 %}
         class `{{ struct.base_name }}` {{ brands }}
-    {% else -%}
+    {%- else %}
         class `{{ struct.base_name }}` 
-    {% endif -%}
-    }
-    <<struct>> `{{ struct.base_name }}`
+    {% endif %}
+}
+<<struct>> `{{ struct.base_name }}`
 
     {% for cur in struct.fields -%}
-        {{ field_tmpl::render_field(parent_name=struct.base_name, field=cur) }}
+{{ field_tmpl::render_field(parent_name=struct.base_name, field=cur) }}
     {% endfor -%}
     {% for cur in struct.union_fields -%}
-        {{ field_tmpl::render_field(parent_name=struct.base_name, field=cur) }}
+{{ field_tmpl::render_field(parent_name=struct.base_name, field=cur) }}
     {% endfor -%}
 {% endmacro render_struct -%}
 
