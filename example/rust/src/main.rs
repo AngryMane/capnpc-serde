@@ -114,7 +114,7 @@ fn render_node(cache: Arc<serde_json::Value>, root_value: Arc<serde_json::Value>
 
 fn get_name_by_id(cache: Arc<serde_json::Value>, _: Arc<serde_json::Value>) -> impl tera::Function {
     Box::new(move |args: &HashMap<String, Value>| -> tera::Result<Value> {
-        let target_id = &args["id"].as_str().unwrap().to_string();
+        let target_id = &args["id"].as_str().unwrap().to_string().replace("\"", "");
         let target_obj = cache.as_object().unwrap().get(target_id);
         if let Some(a) = target_obj {
             let obj = a.as_object().unwrap();

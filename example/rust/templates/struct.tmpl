@@ -4,6 +4,7 @@
 {# render_struct #}
 {#################}
 {%- macro render_struct(struct) -%}
+
     {%- set brands = "~" -%}
     {%- for brand in struct.brands -%}
         {%- if loop.first -%}
@@ -14,11 +15,14 @@
     {%- endfor -%}
     {%- set brands = brands ~ "~" -%}
 
+    {%- set namespace = struct.abs_file_path | split(pat="/") | last | replace(from=".", to="_") -%}
+    namespace {{ namespace }} {
     {%- if struct.brands | length > 0 -%}
         class `{{ struct.base_name }}` {{ brands }}
     {% else -%}
         class `{{ struct.base_name }}` 
     {% endif -%}
+    }
     <<struct>> `{{ struct.base_name }}`
 
     {% for cur in struct.fields -%}
@@ -31,6 +35,6 @@
 
 {%- if struct.base_name is containing("$") -%}
 {%- else -%}
-    {{ self::render_struct(struct=struct) }}
+{{ self::render_struct(struct=struct) }}
 {%- endif -%}
 

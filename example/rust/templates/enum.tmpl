@@ -1,4 +1,8 @@
+
+{%- set namespace = enum.abs_file_path | split(pat="/") | last | replace(from=".", to="_") -%}
+namespace {{ namespace }} {
 class {{ enum.base_name }} 
+}
 <<enum>> {{ enum.base_name }}
 {% for cur_name in struct.enum_names %}
 {{ enum.base_name }} : {{ cur_name }}
