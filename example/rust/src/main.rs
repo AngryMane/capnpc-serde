@@ -235,6 +235,9 @@ fn get_object_related_ids_internal(cache: Arc<serde_json::Value>, node: &serde_j
             for field in node.get("fields").unwrap().as_array().unwrap() {
                 ids.append(&mut get_field_related_ids(cache.clone(), field));
             }
+            for field in node.get("union_fields").unwrap().as_array().unwrap() {
+                ids.append(&mut get_field_related_ids(cache.clone(), field));
+            }
         }
         "Interface" => {
             for method in node.get("methods").unwrap().as_array().unwrap() {
