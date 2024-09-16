@@ -11,14 +11,15 @@
 {%- set brands = brands ~ ">" -%}
 
 {%- set namespace = interface.abs_file_path | split(pat="/") | last | replace(from=".", to="_") -%}
+{%- set uniquename = get_name_by_id(id=interface.id, is_unique=true) -%}
 package {{ namespace }} {
 {% if interface.brands | length > 0 -%}
-    interface {{ interface.base_name }} {{ brands }}
+    interface "{{ interface.base_name }} {{ brands }}" as {{ uniquename }} 
 {% else -%}
-    interface {{ interface.base_name }} 
+    interface "{{ interface.base_name }}" as {{ uniquename }} 
 {% endif -%}
-}
 
 {% for cur in interface.methods -%}
-    {{ method_tmpl::render_method(method=cur, parent_name=interface.base_name) }}
+    {{ method_tmpl::render_method(method=cur, parent_name=uniquename ) }}
 {%- endfor %}
+}

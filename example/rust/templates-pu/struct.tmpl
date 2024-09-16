@@ -16,20 +16,21 @@
     {%- set brands = brands ~ ">" -%}
 
     {%- set namespace = struct.abs_file_path | split(pat="/") | last | replace(from=".", to="_") -%}
+    {%- set uniquename = get_name_by_id(id=struct.id, is_unique=true) -%}
     package {{ namespace }} <<Folder>> {
     {% if struct.brands | length > 0 %}
-        struct {{ struct.base_name }} {{ brands }}
+        struct "{{ struct.base_name }} {{ brands }}" as {{ uniquename }} 
     {%- else %}
-        struct {{ struct.base_name }} 
+        struct "{{ struct.base_name }}" as {{ uniquename }} 
     {% endif %}
-}
 
     {% for cur in struct.fields -%}
-{{ field_tmpl::render_field(parent_name=struct.base_name, field=cur) }}
+{{ field_tmpl::render_field(parent_name=uniquename, field=cur) }}
     {% endfor -%}
     {% for cur in struct.union_fields -%}
-{{ field_tmpl::render_field(parent_name=struct.base_name, field=cur) }}
+{{ field_tmpl::render_field(parent_name=uniquename, field=cur) }}
     {% endfor -%}
+}
 {% endmacro render_struct -%}
 
 {%- if struct.base_name is containing("$") -%}

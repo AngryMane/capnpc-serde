@@ -168,11 +168,16 @@ fn render_node(cache: Arc<serde_json::Value>, root_value: Arc<serde_json::Value>
 fn get_name_by_id(cache: Arc<serde_json::Value>, _: Arc<serde_json::Value>) -> impl tera::Function {
     Box::new(move |args: &HashMap<String, Value>| -> tera::Result<Value> {
         let target_id = &args["id"].as_str().unwrap().to_string().replace("\"", "");
+        let is_unique = if args.get("is_unique").is_some() { args.get("is_unique").unwrap().as_bool().unwrap() } else { false };
+
         let target_obj = cache.as_object().unwrap().get(target_id);
         if let Some(a) = target_obj {
             let obj = a.as_object().unwrap();
-            let result = obj.get("base_name").unwrap().as_str().unwrap();
+            let mut result = obj.get("base_name").unwrap().as_str().unwrap().to_owned();
+            let file_name = obj.get("abs_file_path").unwrap().as_str().unwrap().split("/").last().unwrap().replace(".", "_");
+            result = if is_unique { file_name + "__" + &result } else { result };
             return Ok(tera::to_value(result).unwrap());
+
         } else {
             return Ok(tera::to_value("Not-Found").unwrap());
         }
