@@ -8,8 +8,11 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
-            "program": "${workspaceFolder}/target/debug/example",
-            "args": ["${workspaceFolder}/../../capnpc-serde/testdata/sample.capnp"],
+            "program": "${workspaceFolder}/target/debug/capnp-mmd",
+            "args": [
+                "-p",
+                "${workspaceFolder}/../../capnpc-serde/testdata/sample.capnp"
+            ],
             "cwd": "${workspaceFolder}"
         }
     ]

@@ -26,7 +26,11 @@ struct Args {
     /// prefixes of the schema file
     #[arg(short, long, default_values_t = Vec::<String>::new(), num_args(0..))]
     src_prefixes: Vec<String>,
+    #[arg(short, long, default_value_t = false)]
+    plantuml: bool,
 }
+
+static mut G_PLANTUML: bool = false;
 
 fn main() {
     let args = Args::parse();
@@ -35,6 +39,9 @@ fn main() {
     //    println!("This sample needs target schema file path as an argument.");
     //    return;
     //}
+    unsafe {
+        G_PLANTUML = args.plantuml;
+    }
     let target_file_path = &args.target_file_path;
     let import_pathes: Vec<PathBuf> = args.import_paths.iter().map(|x| PathBuf::from(x)).collect();
     let _a: Vec<PathBuf> = args.src_prefixes.iter().map(|x| PathBuf::from(x)).collect();
@@ -42,17 +49,49 @@ fn main() {
     render_file(serialized);
 }
 
-pub fn render_file(serialized: serde_json::Value) {
-    let mut renderer: Option<Tera> = match Tera::new("/usr/local/bin/templates/**") {
+fn load_tera() -> Option<Tera> {
+    let mut system_tmp_path = "/usr/local/bin/templates/**";
+    unsafe {
+        if G_PLANTUML {
+            system_tmp_path = "/usr/local/bin/templates-pu/**";
+        }
+    }
+    let mut local_tmp_path = "./templates/**";
+    unsafe {
+        if G_PLANTUML {
+            local_tmp_path = "./templates-pu/**";
+        }
+    }
+
+    let renderer: Option<Tera> = match Tera::new(local_tmp_path) {
         Ok(t) => Some(t),
         Err(_) => None,
     };
-    if renderer.is_none() {
-        renderer = match Tera::new("./templates/**") {
-            Ok(t) => Some(t),
-            Err(_) => None,
-        };
+
+    if let Some(a) = renderer {
+        if a.get_template_names().count() > 0{
+            return Some(a);
+        }
     }
+
+    let renderer: Option<Tera> = match Tera::new(system_tmp_path) {
+        Ok(t) => Some(t),
+        Err(_) => None,
+    };
+
+    if let Some(a) = renderer {
+        if a.get_template_names().count() > 0{
+            return Some(a);
+        }
+    }
+
+    println!("templates not found.");
+    return None;
+
+}
+
+pub fn render_file(serialized: serde_json::Value) {
+    let renderer = load_tera();
     if renderer.is_none() {
         println!("templates not found.");
         return;
@@ -79,16 +118,7 @@ pub fn render_file(serialized: serde_json::Value) {
 
 fn render_relationship(cache: Arc<serde_json::Value>, root_value: Arc<serde_json::Value>) -> impl tera::Function{
     Box::new(move |args: &HashMap<String, Value>| -> tera::Result<Value> {
-        let mut renderer: Option<Tera> = match Tera::new("/usr/local/bin/templates/**") {
-            Ok(t) => Some(t),
-            Err(_) => None,
-        };
-        if renderer.is_none() {
-            renderer = match Tera::new("./templates/**") {
-                Ok(t) => Some(t),
-                Err(_) => None,
-            };
-        }
+        let renderer = load_tera();
         let mut renderer = renderer.unwrap();
 
         let mut context: Context = Context::new();
@@ -110,16 +140,7 @@ fn render_relationship(cache: Arc<serde_json::Value>, root_value: Arc<serde_json
 
 fn render_node(cache: Arc<serde_json::Value>, root_value: Arc<serde_json::Value>) -> impl tera::Function{
     Box::new(move |args: &HashMap<String, Value>| -> tera::Result<Value> {
-        let mut renderer: Option<Tera> = match Tera::new("/usr/local/bin/templates/**") {
-            Ok(t) => Some(t),
-            Err(_) => None,
-        };
-        if renderer.is_none() {
-            renderer = match Tera::new("./templates/**") {
-                Ok(t) => Some(t),
-                Err(_) => None,
-            };
-        }
+        let renderer = load_tera();
         let mut renderer = renderer.unwrap();
         let mut context: Context = Context::new();
         renderer.register_function("render_node", render_node(Arc::clone(&cache), Arc::clone(&root_value)));
@@ -170,12 +191,22 @@ fn get_complex_type_name(cache: Arc<serde_json::Value>) -> impl tera::Function {
 }
 
 fn get_complex_type_name_internal(cache: Arc<serde_json::Value>, complex_type: &serde_json::Map<String, Value>, resolve_generics: bool) -> String {
+    let mut generics_start = "~";
+    let mut generics_end = "~";
+    let mut plantuml = false;
+    unsafe {
+        if G_PLANTUML {
+            generics_start = "<";
+            generics_end = ">";
+            plantuml = true;
+        }
+    }
     if let Some(list_value) = complex_type.get("List"){
         if let Some(list_obj) = list_value.as_object() {
             let nested_type_name = get_complex_type_name_internal(cache, &list_obj, resolve_generics);
-            return format!("List~{}~", nested_type_name);
+            return format!("List{}{}{}", generics_start, nested_type_name, generics_end);
         } else {
-            return format!("List~{}~", list_value.as_str().unwrap());
+            return format!("List{}{}{}", generics_start, list_value.as_str().unwrap(), generics_end);
         }
     }
     if let Some(enum_value) = complex_type.get("Enum"){
@@ -217,13 +248,13 @@ fn get_complex_type_name_internal(cache: Arc<serde_json::Value>, complex_type: &
             let mut brands_str_v  = 
                 brands
                 .iter()
-                .fold(String::from("~"), |x, y| x + y.as_str() + ",");
+                .fold(String::from(generics_start), |x, y| x + y.as_str() + ",");
             brands_str_v.pop();
-            brands_str_v  += "~";
+            brands_str_v  += generics_end;
             name += brands_str_v.as_str();
         } 
 
-        let name = format!("`{}`", name);
+        let name = if plantuml { name } else { format!("`{}`", name) };
         return String::from(name);
     }
     if let Some(interface_type) = complex_type.get("Interface"){
@@ -255,9 +286,9 @@ fn get_complex_type_name_internal(cache: Arc<serde_json::Value>, complex_type: &
             let mut brands_str_v  = 
                 brands
                 .iter()
-                .fold(String::from("~"), |x, y| x + y.as_str() + ",");
+                .fold(String::from(generics_start), |x, y| x + y.as_str() + ",");
             brands_str_v.pop();
-            brands_str_v  += "~";
+            brands_str_v  += generics_end;
             name += brands_str_v.as_str();
         } 
 

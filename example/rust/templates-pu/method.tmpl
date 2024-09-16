@@ -1,0 +1,36 @@
+{#################}
+{# render_method #}
+{#################}
+{%- macro render_method(method, parent_name) -%}
+{{parent_name}} : {{ method.name }}(
+{%- for cur in method.parameters.fields -%} 
+{%- if loop.last -%}
+{{ self::render_param(param=cur) }}
+{%- else -%}
+{{ self::render_param(param=cur) }},
+{%- endif -%}
+{%- endfor -%}
+) : ({% for cur in method.results.fields -%} 
+{%- if loop.last -%}
+{{ self::render_param(param=cur) }}
+{%- else -%}
+{{ self::render_param(param=cur) }},
+{%- endif -%}
+{%- endfor -%})
+{% endmacro render_method -%}
+
+{#################}
+{# render_param #}
+{#################}
+{%- macro render_param(param) -%}
+{%- if param.field_type == "Slot" -%}
+{%- if param.type_ is object -%}
+{{ get_complex_type_name(complex_type=param.type_) }} {{ param.name }} 
+{%- else -%}
+{{ param.type_ }} {{ param.name }} 
+{%- endif -%}
+{%- endif -%}
+{%- if param.field_type == "Group" -%}
+{{ get_name_by_id(id=param.type_id) }} {{ param.name }} 
+{%- endif -%}
+{% endmacro render_param -%}

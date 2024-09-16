@@ -1,0 +1,24 @@
+{%- import "method.tmpl" as method_tmpl -%}
+
+{%- set brands = "<" -%}
+{%- for brand in interface.brands -%}
+    {%- if loop.first -%}
+        {%- set_global brands = brands ~ brand -%}
+    {%- else -%}
+        {%- set_global brands = brands ~ "," ~ brand -%}
+    {%- endif -%}
+{%- endfor -%}
+{%- set brands = brands ~ ">" -%}
+
+{%- set namespace = interface.abs_file_path | split(pat="/") | last | replace(from=".", to="_") -%}
+package {{ namespace }} {
+{% if interface.brands | length > 0 -%}
+    interface {{ interface.base_name }} {{ brands }}
+{% else -%}
+    interface {{ interface.base_name }} 
+{% endif -%}
+}
+
+{% for cur in interface.methods -%}
+    {{ method_tmpl::render_method(method=cur, parent_name=interface.base_name) }}
+{%- endfor %}

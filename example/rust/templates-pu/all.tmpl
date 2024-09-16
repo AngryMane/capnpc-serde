@@ -1,0 +1,12 @@
+@startuml
+
+
+{%- for id, node in id_map -%}
+{{ render_node(id=id) }}
+{%- endfor -%}
+
+{% for id, node in id_map -%}
+{{ render_relationship(id=id) }}
+{%- endfor %}
+
+@enduml
